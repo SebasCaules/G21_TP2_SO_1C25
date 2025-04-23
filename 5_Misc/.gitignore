@@ -1,0 +1,21 @@
+#Binary Files
+*.bin
+*.sys
+
+#The images
+*.img
+*.qcow2
+*.vmdk
+
+#Object files
+*.o
+.DS_Store
+.bash_history
+compile.sh
+.idea/vcs.xml
+.idea/misc.xml
+.vscode/c_cpp_properties.json
+.vscode/c_cpp_properties.json
+.vscode/c_cpp_properties.json
+.vscode/c_cpp_properties.json
+.vscode/c_cpp_properties.json

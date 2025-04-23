@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "stdarg.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "syscallsint.h": "c",
+        "stdint.h": "c",
+        "syscalls.h": "c",
+        "__availability": "c",
+        "__stdarg_va_arg.h": "c",
+        "__stdarg_va_list.h": "c",
+        "songplayer.h": "c",
+        "shellfunctions.h": "c",
+        "keyboard.h": "c",
+        "locale": "c",
+        "ostream": "c"
+    }
+}
