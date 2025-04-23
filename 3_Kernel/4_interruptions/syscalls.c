@@ -11,22 +11,6 @@
 extern uint64_t regs[17];
 
 typedef uint64_t (*syscall_fn)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
-
-// typedef enum {
-//     SLEEP = 0,
-//     TIME,
-//     SETFONT,
-//     READ,
-//     WRITE,
-//     CLEAR,
-//     DRAW_RECTANGLE,
-//     TICK,
-//     RESET_CURSOR,
-//     GET_REGS,
-//     BEEP,
-//     DRAW_PIXEL
-// } syscallsNum;
-
 typedef struct {
     uint64_t r15, r14, r13, r12, r11, r10, r9, r8, rsi, rdi, rbp, rdx, rcx, rbx, rax;
 } Registers;
@@ -47,22 +31,6 @@ syscall_fn syscall_table[] = {
 };
 
 uint64_t sysCallHandler(Registers * regs) {
-    // switch (regs->rax) {
-    // case SLEEP: return sys_sleep((uint64_t)regs->rdi);
-    // case TIME: return sys_time((time_struct *)regs->rdi);
-    // case SETFONT: return sys_set_font_scale((uint64_t)regs->rdi);
-    // case READ: return sys_read((uint64_t)regs->rdi, (uint16_t *)regs->rsi, (uint64_t)regs->rdx);
-    // case WRITE: return sys_write((uint64_t)regs->rdi, (uint16_t *)regs->rsi, (uint64_t)regs->rdx);      
-    // case CLEAR: return sys_clear();
-    // case DRAW_RECTANGLE: return sys_draw_rectangle((uint64_t)regs->rdi, (uint64_t)regs->rsi, (uint64_t)regs->rdx, (uint64_t)regs->rcx, (uint32_t)regs->r8);
-    // case TICK: return sys_tick();
-    // case RESET_CURSOR: return sys_reset_cursor();
-    // case GET_REGS: return sys_get_regs((uint64_t *)regs->rdi);
-    // case BEEP: return sys_beep((uint64_t)regs->rdi, (uint64_t)regs->rsi);
-    // case DRAW_PIXEL: return sys_draw_pixel((uint64_t)regs->rdi, (uint64_t)regs->rsi, (uint32_t)regs->rdx);
-    // default: return 0;
-    // }
-
     if (regs->rax < SYSCALL_COUNT) {
         return syscall_table[regs->rax](
             (uint64_t)regs->rdi,
@@ -72,7 +40,7 @@ uint64_t sysCallHandler(Registers * regs) {
             (uint64_t)regs->r8
         );
     }
-    return 0; // syscall inválido
+    return 0;
 }
 
 uint64_t sys_sleep(uint64_t milliseconds) {
