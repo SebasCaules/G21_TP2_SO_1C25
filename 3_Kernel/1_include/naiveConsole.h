@@ -11,5 +11,7 @@ void ncPrintHex(uint64_t value);
 void ncPrintBin(uint64_t value);
 void ncPrintBase(uint64_t value, uint32_t base);
 void ncClear();
+uint64_t ncPrintStrByLength(char* str, int fgcolor, int bgcolor, int length);
+uint64_t ncPrintCharNew(char c, int fgcolor, int bgcolor);
 
 #endif

@@ -16,6 +16,29 @@ int strcmp(const char *str1, const char *str2) {
     return *(unsigned char *)str1 - *(unsigned char *)str2;
 }
 
+// Copia todo el string src en dst, incluyendo el '\0'
+char *strcpy(char *dst, const char *src) {
+    char *ret = dst;
+    while ((*dst++ = *src++)) {
+        ; // Copia hasta que src sea '\0'
+    }
+    return ret;
+}
+
+// Copia hasta n caracteres de src a dst
+char *strncpy(char *dst, const char *src, int n) {
+    char *ret = dst;
+    while (n > 0 && *src) {
+        *dst++ = *src++;
+        n--;
+    }
+    while (n > 0) {
+        *dst++ = '\0'; // Rellenamos con '\0' si src terminó antes
+        n--;
+    }
+    return ret;
+}
+
 char toLowercase(char c) {
     if (c >= 'A' && c <= 'Z') {
         return c + 32;

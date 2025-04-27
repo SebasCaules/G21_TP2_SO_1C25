@@ -49,6 +49,13 @@ void * initializeKernelBinary() {
 
 int main() {
 	load_idt();
+	init_memory_manager(endOfKernel);
+
+    // Test: pedir una página
+    void *page = alloc_page();
+    if (page) {
+        // Usar la página
+    }
 	((EntryPoint)sampleCodeModuleAddress)();
 
 	return 0;
