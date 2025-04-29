@@ -148,3 +148,8 @@ uint64_t printStrByLength(char* str, int fgcolor, int bgcolor, int length);
  */
 int64_t setFontScale(uint64_t scale);
 
+
+/**
+ * @brief Moves the screen up if it is full.
+ */
+void moveScreenUpIfFull();

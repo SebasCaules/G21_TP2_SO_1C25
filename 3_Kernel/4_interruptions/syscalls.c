@@ -84,8 +84,8 @@ int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
 
 int64_t sys_write(uint64_t fd, uint16_t * buffer, uint64_t length) {
     uint32_t fileDescriptorStyle[] = {0, 0x00FFFFFF, 0x00FF0000, 0x0000FF00};
-    // return printStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
-    return ncPrintStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
+    return printStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
+    // return ncprintStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
 
 }
 

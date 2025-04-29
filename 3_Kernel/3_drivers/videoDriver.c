@@ -47,7 +47,7 @@ uint64_t printChar(char c, int fgcolor, int bgcolor) {
     }
 
     if (currentY + CHAR_HEIGHT > WINDOW_HEIGHT - BORDER_PADDING) {
-        clear();
+        moveScreenUpIfFull();
     }
     currentLinePosition++;
     drawChar(c, currentX + HORIZONTAL_PADDING, currentY, fgcolor, bgcolor, fontScale);
@@ -152,4 +152,25 @@ void updateTextCursor(CursorMovementType movementType) {
     }
     drawRectangle(currentX + HORIZONTAL_PADDING / 2, currentY, 1, CHAR_HEIGHT * fontScale, 0xFFFFFFFF); // place new one
     drawRectangle(currentX + xOffset, currentY + yOffset, 1, CHAR_HEIGHT * fontScale, 0x0000000); // remove previous one
+}
+
+void moveScreenUpIfFull() {
+    if (currentY >= (WINDOW_HEIGHT - (CHAR_HEIGHT * fontScale)) - BORDER_PADDING) {
+        uint8_t *frame_buffer = (uint8_t *)(uint64_t) VBE_mode_info->framebuffer;
+        uint64_t pitch = VBE_mode_info->pitch;
+        uint64_t height = WINDOW_HEIGHT;
+        uint64_t scroll_amount = (CHAR_HEIGHT + VERTICAL_PADDING) * fontScale;
+
+        for (uint64_t y = 0; y < height - scroll_amount; y++) {
+            uint8_t *dest = frame_buffer + y * pitch;
+            uint8_t *src  = frame_buffer + (y + scroll_amount) * pitch;
+            memcpy(dest, src, pitch);
+        }
+
+        for (uint64_t y = height - scroll_amount; y < height; y++) {
+            memset(frame_buffer + y * pitch, 0x00, pitch);
+        }
+
+        currentY -= scroll_amount;
+    }
 }

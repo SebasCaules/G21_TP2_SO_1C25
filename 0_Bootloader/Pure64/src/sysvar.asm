@@ -8,7 +8,7 @@
 
 ;CONFIG
 cfg_smpinit:		db 1	; By default SMP is enabled. Set to 0 to disable.
-cfg_vesa:		db 0	; By default VESA is disabled. Set to 1 to enable.
+cfg_vesa:		db 1	; By default VESA is disabled. Set to 1 to enable.
 cfg_default:		db 0	; By default we don't need a config file so set to 0. If a config file is found set to 1.
 cfg_e820:		db 1	; By default E820 should be present. Pure64 will set this to 0 if not found/usable.
 cfg_mbr:		db 0	; Did we boot off of a disk with a proper MBR
@@ -63,7 +63,7 @@ msg_CPU:		db '[CPU: ', 0
 msg_mhz:		db 'MHz x', 0
 msg_MEM:		db ']  [MEM: ', 0
 msg_mb:			db ' MiB]', 0
-msg_startingkernel:	db 'Starting kernel...', 13, 13, 0
+msg_startingkernel:	db 'sebas', 13, 13, 0
 msg_no64:		db 'ERROR: This computer does not support 64-bit mode.', 0
 msg_novesa:		db 'VESA error', 0
 
