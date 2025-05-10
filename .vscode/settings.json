@@ -13,6 +13,7 @@
         "shellfunctions.h": "c",
         "keyboard.h": "c",
         "locale": "c",
-        "ostream": "c"
+        "ostream": "c",
+        "memorymap.h": "c"
     }
 }

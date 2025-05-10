@@ -1,46 +1,111 @@
 #include "memoryManager.h"
+#include <stdint.h>
+#include <stddef.h>
 
-#define PAGE_SIZE 4096 // 4 KB por página
+typedef struct block_header {
+	uint32_t size;
+	uint8_t free;
+	struct block_header *next;
+} block_header_t;
 
-// Cambiá esto si tu memoria es más chica o más grande (por ahora ponemos 128MB)
-#define TOTAL_MEMORY (128 * 1024 * 1024)
-#define TOTAL_PAGES (TOTAL_MEMORY / PAGE_SIZE)
+#define ALIGN4(x) (((((x) - 1) >> 2) << 2) + 4)
+#define BLOCK_HEADER_SIZE sizeof(block_header_t)
 
-// Bitmap de páginas: 0 = libre, 1 = ocupado
-static uint8_t page_bitmap[TOTAL_PAGES];
+static void *heap_start = NULL;
+static uint32_t heap_size = 0;
+static block_header_t *free_list = NULL;
+static mem_info_t mem_info;
 
-// Dirección física donde arranca la memoria libre
-static uint64_t free_memory_start = 0;
+// Inicializa el memory manager con una región de memoria y su tamaño
+void my_mem_init(void *start, uint32_t size) {
+    heap_start = start;
+    heap_size = size;
 
-// Inicializa el memory manager
-void init_memory_manager(uint64_t kernel_end_address) {
-    for (uint64_t i = 0; i < TOTAL_PAGES; i++) {
-        page_bitmap[i] = 0; // Todo libre inicialmente
-    }
+    mem_info.total_mem = size;
+    mem_info.used_mem = 0;
 
-    free_memory_start = kernel_end_address;
-
-    uint64_t pages_reserved = (kernel_end_address + PAGE_SIZE - 1) / PAGE_SIZE;
-    for (uint64_t i = 0; i < pages_reserved; i++) {
-        page_bitmap[i] = 1; // Marcar páginas usadas por el kernel
-    }
+    // Inicializamos un único bloque grande que ocupa todo el heap
+    free_list = (block_header_t *)start;
+    free_list->size = size - BLOCK_HEADER_SIZE; // solo la parte de datos
+    free_list->free = 1;
+    free_list->next = NULL;
 }
 
-// Asigna una página libre y la marca como ocupada
-void *alloc_page() {
-    for (uint64_t i = 0; i < TOTAL_PAGES; i++) {
-        if (page_bitmap[i] == 0) {
-            page_bitmap[i] = 1;
-            return (void *)(i * PAGE_SIZE);
+void *my_malloc(uint32_t size) {
+    size = ALIGN4(size);
+
+    block_header_t *curr = free_list;
+
+    // Recorremos la lista buscando un bloque libre suficientemente grande
+    while (curr != NULL) {
+        if (curr->free && curr->size >= size) {
+            // Si el bloque es suficientemente grande para dividir
+            if (curr->size >= size + BLOCK_HEADER_SIZE + 4) {
+                // Dividimos el bloque en uno asignado y otro libre
+                block_header_t *new_block = (block_header_t *)((uint8_t *)curr + BLOCK_HEADER_SIZE + size);
+                new_block->size = curr->size - size - BLOCK_HEADER_SIZE;
+                new_block->free = 1;
+                new_block->next = curr->next;
+
+                curr->size = size;
+                curr->next = new_block;
+            }
+
+            curr->free = 0;
+            mem_info.used_mem += curr->size + BLOCK_HEADER_SIZE;
+
+            // Retornamos la dirección después de la cabecera (donde empieza el bloque útil)
+            return (void *)((uint8_t *)curr + BLOCK_HEADER_SIZE);
+        }
+
+        curr = curr->next;
+    }
+
+    // No se encontró un bloque libre suficientemente grande
+    return NULL;
+}
+
+// Libera un bloque previamente asignado
+void my_free(void *ptr) {
+    if (!ptr) return;
+
+    // Obtenemos la cabecera del bloque a partir del puntero
+    block_header_t *block = (block_header_t *)((uint8_t *)ptr - BLOCK_HEADER_SIZE);
+    block->free = 1;
+
+    mem_info.used_mem -= block->size + BLOCK_HEADER_SIZE;
+
+    // Intentamos fusionar bloques adyacentes libres
+    block_header_t *curr = free_list;
+    while (curr != NULL && curr->next != NULL) {
+        // Si dos bloques están libres y son contiguos en memoria
+        if (curr->free && curr->next->free &&
+            (uint8_t *)curr + curr->size + BLOCK_HEADER_SIZE == (uint8_t *)curr->next) {
+            // Fusionamos: absorbemos el siguiente bloque
+            curr->size += BLOCK_HEADER_SIZE + curr->next->size;
+            curr->next = curr->next->next;
+        } else {
+            curr = curr->next;
         }
     }
-    return 0; // No hay páginas disponibles
 }
 
-// Libera una página (la marca como libre)
-void free_page(void *addr) {
-    uint64_t page = ((uint64_t)addr) / PAGE_SIZE;
-    if (page < TOTAL_PAGES) {
-        page_bitmap[page] = 0;
-    }
+// Devuelve información del estado de la memoria
+mem_info_t *mem_dump() {
+    mem_info.free_mem = mem_info.total_mem - mem_info.used_mem;
+    return &mem_info;
 }
+
+/*
+Explicacion visual:
+| Header | Datos... | Header | Datos... | Header | Datos... |
+^ heap_start
+
+Header contiene:
+Tamaño de datos del bloque
+Si está libre
+Siguiente bloque
+*/
+
+// Algoritmo heap 4: https://freertos.org/Documentation/02-Kernel/02-Kernel-features/09-Memory-management/01-Memory-management#heap_4c
+

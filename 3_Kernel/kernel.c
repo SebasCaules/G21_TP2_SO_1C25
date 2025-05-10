@@ -6,6 +6,8 @@
 
 #include <videoDriver.h>
 #include "idtLoader.h"
+#include <memoryMap.h>
+#include <memoryManager.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -48,14 +50,15 @@ void * initializeKernelBinary() {
 }
 
 int main() {
+	my_mem_init(START_FREE_MEM, MEM_SIZE);
 	load_idt();
-	init_memory_manager(endOfKernel);
+	// init_memory_manager(endOfKernel);
 
     // Test: pedir una página
-    void *page = alloc_page();
-    if (page) {
-        // Usar la página
-    }
+    // void *page = alloc_page();
+    // if (page) {
+    //     // Usar la página
+    // }
 	((EntryPoint)sampleCodeModuleAddress)();
 
 	return 0;

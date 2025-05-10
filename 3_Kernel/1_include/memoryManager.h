@@ -3,14 +3,17 @@
 
 #include <stdint.h>
 
-// Inicializa el administrador de memoria
-// Recibe la dirección donde termina el kernel (kernel_end_address)
-void init_memory_manager(uint64_t kernel_end_address);
+#define MEM_SIZE 0x100000 // 1 MiB
 
-// Asigna una página de 4KB
-void *alloc_page(void);
+typedef struct {
+    uint32_t total_mem;
+    uint32_t used_mem;
+    uint32_t free_mem;
+} mem_info_t;
 
-// Libera una página
-void free_page(void *addr);
+void my_mem_init(void *start, uint32_t size);
+void *my_malloc(uint32_t size);
+void my_free(void *ptr);
+mem_info_t *mem_dump();
 
-#endif
+#endif // !MEMORY_MANAGER_H
