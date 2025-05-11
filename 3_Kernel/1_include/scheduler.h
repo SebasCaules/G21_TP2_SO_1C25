@@ -22,7 +22,7 @@ typedef struct {
 } process_info_t;
 
 
-scheduler_t createScheduler(void);
+scheduler_t initScheduler(void);
 
 
 scheduler_t getScheduler(void);
@@ -31,11 +31,11 @@ scheduler_t getScheduler(void);
 void* schedule(void* prevRSP);
 
 
-int64_t addProcess(entry_point_t main, char** argv, char* name,
-                   uint8_t unkillable, int* fileDescriptors);
+int64_t addProcess(entry_point_t main, char** argv, char* name, 
+    uint8_t unkillable, int* fileDescriptors);
 
 
-void freeScheduler(void);
+void destroyScheduler(void);
 
 
 void yield(void);
@@ -56,7 +56,7 @@ int blockProcess(uint16_t pid);
 int unblockProcess(uint16_t pid);
 
 
-int changePriority(uint16_t pid, uint8_t newPriority);
+int setPriority(uint16_t pid, uint8_t newPriority);
 
 
 process_info_t* ps(void);
@@ -68,16 +68,16 @@ void myExit(int64_t retValue);
 int64_t waitPid(uint32_t pid);
 
 
-void getCurrentFds(int* fds);
+void getFds(int* fds);
 
 
-int blockProcessTime(uint16_t pid, uint8_t time);
+int sleepBlock(uint16_t pid, uint8_t time);
 
 
-void killProcessInForeground(void);
+void killForegroundProcess(void);
 
 
-void updateStdinWaiting(uint8_t value);
+void updateStdinWait(uint8_t value);
 
 
 #endif // SCHEDULER_H
