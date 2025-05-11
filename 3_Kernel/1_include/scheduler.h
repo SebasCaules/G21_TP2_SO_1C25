@@ -60,7 +60,7 @@ int unblockProcess(uint16_t pid);
 int setPriority(uint16_t pid, uint8_t newPriority);
 
 
-process_info_t* ps(void);
+process_info_t* processStatus(void);
 
 
 void myExit(int64_t retValue);
