@@ -2,6 +2,9 @@
 #define SYSCALLS_H
 
 #include <stdint.h>
+#include "scheduler.h"
+#include "process.h"
+#include "memoryManager.h"
 
 typedef enum {
     STDIN = 0,
@@ -131,11 +134,83 @@ uint64_t sys_beep(uint64_t freq, uint64_t milliseconds);
  */
 uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color);
 
+// Memory Manager related syscalls
+void *sys_my_malloc(uint32_t size);
+
+uint16_t sys_my_free(void *ptr);
+
+mem_info_t *sys_mem_dump();
+
+/**
+ * @brief Creates and schedules a new process in the system.
+ * @param main Entry point function of the process.
+ * @param argv Arguments passed to the process.
+ * @param name Name of the process.
+ * @param unkillable If set to 1, the process cannot be killed.
+ * @param fileDescriptors Initial file descriptors for the process.
+ * @return The PID of the new process on success, or -1 on failure.
+ */
+int64_t sys_new_process(entry_point_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
+
 /**
  * @brief Retrieves the current state of the CPU registers and stores it in a snapshot.
  * @param snapshot Pointer to a Snapshot structure where the register values will be stored.
  */
+
 int64_t sys_exit(int64_t retValue);
 
-#endif // !SYSCALLS_H
+/**
+ * @brief Gets the PID of the currently executing process.
+ * @return The PID of the current process.
+ */
+uint16_t sys_get_pid(void);
 
+/**
+ * @brief Returns an array of information about all current processes.
+ * @return A pointer to an array of process_info_t structures.
+ */
+process_info_t* sys_process_status(void);
+
+/**
+ * @brief Terminates the process with the given PID.
+ * @param pid The PID of the process to terminate.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int32_t sys_kill_process(uint16_t pid);
+
+/**
+ * @brief Sets the priority of a process.
+ * @param pid The PID of the process.
+ * @param newPriority The new priority value.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int sys_set_priority(uint16_t pid, uint8_t newPriority);
+
+/**
+ * @brief Blocks a process from being scheduled.
+ * @param pid The PID of the process to block.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int sys_block_process(uint16_t pid);
+
+/**
+ * @brief Unblocks a previously blocked process.
+ * @param pid The PID of the process to unblock.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int sys_unblock_process(uint16_t pid);
+
+/**
+ * @brief Terminates the currently executing process.
+ * @return 0 on success
+ */
+uint16_t sys_yield(void);
+
+/**
+ * @brief Waits for a process with a specific PID to terminate.
+ * @param pid The PID of the process to wait for.
+ * @return The return value of the terminated process, or -1 on error.
+ */
+int64_t sys_waitpid(uint32_t pid);
+
+#endif // !SYSCALLS_H

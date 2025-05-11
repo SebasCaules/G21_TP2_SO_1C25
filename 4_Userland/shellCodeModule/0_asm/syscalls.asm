@@ -11,7 +11,22 @@ GLOBAL sys_get_regs
 GLOBAL sys_beep
 GLOBAL sys_draw_pixel
 
+; Memory Manager syscalls
+GLOBAL sys_my_malloc
+GLOBAL sys_my_free
+GLOBAL sys_mem_dump
+
+; Scheduler syscalls
+GLOBAL sys_new_process
 GLOBAL sys_exit
+GLOBAL sys_get_pid
+GLOBAL sys_process_status
+GLOBAL sys_kill_process
+GLOBAL sys_set_priority
+GLOBAL sys_block_process
+GLOBAL sys_unblock_process
+GLOBAL sys_yield
+GLOBAL sys_waitpid
 
 section .text
 
@@ -131,5 +146,42 @@ sys_beep:
 sys_draw_pixel:
     sys_handler 11
 
-sys_exit:
+; Memory Manager syscalls
+sys_my_malloc:
     sys_handler 12
+sys_my_free:
+    sys_handler 13
+sys_mem_dump:
+    sys_handler 14
+
+; Scheduler syscalls
+sys_new_process:
+    sys_handler 15
+
+sys_exit:
+    sys_handler 16
+
+sys_get_pid:
+    sys_handler 17
+
+sys_process_status:
+    sys_handler 18
+
+sys_kill_process:
+    sys_handler 19
+
+sys_set_priority:
+    sys_handler 20
+
+sys_block_process:
+    sys_handler 21
+
+sys_unblock_process:
+    sys_handler 22
+
+sys_yield:
+    sys_handler 23
+
+sys_waitpid:
+    sys_handler 24
+

@@ -7,6 +7,7 @@
 #include <audioDriver.h>
 #include <naiveConsole.h>
 
+
 #define SYSCALL_COUNT (sizeof(syscall_table) / sizeof(syscall_fn))
 
 extern uint64_t regs[17];
@@ -29,7 +30,23 @@ syscall_fn syscall_table[] = {
     (syscall_fn)sys_get_regs,          // 9
     (syscall_fn)sys_beep,              // 10
     (syscall_fn)sys_draw_pixel,        // 11
-    (syscall_fn)sys_exit               // 12
+
+    // Memory Manager related syscalls
+    (syscall_fn)sys_my_malloc,         // 12
+    (syscall_fn)sys_my_free,           // 13
+    (syscall_fn)sys_mem_dump,          // 14
+    
+    // Scheduler related syscalls
+    (syscall_fn)sys_new_process,       // 15
+    (syscall_fn)sys_exit,              // 16
+    (syscall_fn)sys_kill_process,      // 17
+    (syscall_fn)sys_get_pid,           // 18
+    (syscall_fn)sys_process_status,    // 19
+    (syscall_fn)sys_set_priority,      // 20
+    (syscall_fn)sys_block_process,     // 21
+    (syscall_fn)sys_unblock_process,   // 22
+    (syscall_fn)sys_yield,             // 23
+    (syscall_fn)sys_waitpid,           // 24
 };
 
 uint64_t sysCallHandler(Registers * regs) {
@@ -123,7 +140,61 @@ uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color) {
     return 0;
 }
 
+// Memory Manager related syscalls
+
+void *sys_my_malloc(uint32_t size) {
+    return my_malloc(size);
+}
+
+uint16_t sys_my_free(void *ptr) {
+    my_free(ptr);
+    return 0;
+}
+
+mem_info_t *sys_mem_dump() {
+    return mem_dump();
+}
+
+// Scheduler related syscalls
+
+int64_t sys_new_process(entry_point_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
+    return addProcess(main, argv, name, unkillable, fileDescriptors);
+}
+
 int64_t sys_exit(int64_t retValue) {
-    // hacer funcion exit en scheduler y correrla aca
-    return 1;
+    myExit(retValue);
+    return 0;
+}
+
+uint16_t sys_get_pid(void) {
+    return getPid();
+}
+
+process_info_t* sys_process_status(void) {
+    return processStatus();
+}
+
+int32_t sys_kill_process(uint16_t pid) {
+    return killProcess(pid);
+}
+
+int sys_set_priority(uint16_t pid, uint8_t priority) {
+    return setPriority(pid, priority);
+}
+
+int sys_block_process(uint16_t pid) {
+    return blockProcess(pid);
+}
+
+int sys_unblock_process(uint16_t pid) {
+    return unblockProcess(pid);
+}
+
+uint16_t sys_yield(void) {
+    yield();
+    return 0;
+}
+
+int64_t sys_waitpid(uint32_t pid) {
+    return waitPid(pid);
 }
