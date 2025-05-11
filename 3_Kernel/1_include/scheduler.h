@@ -6,26 +6,27 @@
 #include "process.h"
 
 #define MAX_PROCESSES 64
+#define MAX_PRIORITY 4
+#define MIN_PRIORITY 1
 
 typedef struct {
-    process_t* processes[MAX_PROCESSES];
-    uint8_t front;
-    uint8_t rear;
-    uint8_t size;
-} scheduler_t;
-
-typedef struct {
-    uint16_t pid;
-    uint8_t priority;
-    process_status_t status;
     char name[MAX_NAME_LENGTH];
+    uint16_t pid;
+    int16_t ppid;
+    uint8_t priority;
+    void *stackBase;
+    void *stackPointer;
+    bool foreground;
+    process_status_t status;
+    uint64_t cpuTicks; // para calcular el %CPU (eventualmente)
 } process_info_t;
 
+typedef struct scheduler_t * schedulerADT;
 
-scheduler_t initScheduler(void);
+schedulerADT initScheduler(void);
 
 
-scheduler_t getScheduler(void);
+schedulerADT getScheduler(void);
 
 
 void* schedule(void* prevRSP);

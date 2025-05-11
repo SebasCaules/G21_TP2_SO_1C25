@@ -34,7 +34,6 @@ process_t *createProcess(
     uint16_t pid,
     int16_t parent_pid,
     entry_point_t entry_point,
-    int argc,
     char **argv,
     const char *name,
     uint8_t priority,
@@ -45,10 +44,10 @@ process_t *createProcess(
     process_t *p = my_malloc(sizeof(process_t));
     if (p == NULL)
         return NULL;
-
+    
     p->pid = pid;
     p->parent_pid = parent_pid;
-    p->waiting_for_pid = -1; // No waiting for any process initially
+    p->waiting_for_pid = 0; // No waiting for any process initially
     p->priority = priority;
     p->remaining_quantum = priority; // Quantum is initially set to priority
     p->unkillable = unkillable;

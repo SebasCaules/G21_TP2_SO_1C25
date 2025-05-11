@@ -50,7 +50,6 @@ process_t *createProcess(
     uint16_t pid,
     int16_t parent_pid,
     entry_point_t entry_point,
-    int argc,
     char **argv,
     const char *name,
     uint8_t priority,
