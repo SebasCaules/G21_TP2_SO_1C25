@@ -72,7 +72,7 @@ int64_t waitPid(uint32_t pid);
 void getFds(int* fds);
 
 
-int sleepBlock(uint16_t pid, uint8_t time);
+int sleepBlock(uint16_t pid, uint8_t sleep);
 
 
 void killForegroundProcess(void);
