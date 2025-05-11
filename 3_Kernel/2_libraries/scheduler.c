@@ -2,11 +2,13 @@
 #include <memoryMap.h>
 #include <process.h>
 #include <stddef.h>
+#include <time.h>
 
 #define NO_PID -1
 #define STDOUT 1
 #define STDIN 0
 #define INIT_PID 0
+#define SHELL_PID 1
 
 typedef struct scheduler_t {
     process_t* processes[MAX_PROCESSES];
@@ -21,6 +23,7 @@ static schedulerADT scheduler = NULL;
 static int initMain(int argc, char **argv);
 static process_t* getNextProcess(void);
 static void removeProcess(uint16_t pid);
+static void adoptChildren(int16_t pid);
 
 schedulerADT initScheduler(void) {
     if (scheduler != NULL) {
@@ -152,7 +155,25 @@ Qué debería hacer:
 * Si es el proceso actual, forzar un cambio de contexto.
 */
 int32_t killProcess(uint16_t pid) {
+    if (scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL || scheduler->processes[pid]->unkillable) {
+        return -1;
+    }
 
+    adoptChildren(pid);
+    process_t *process = scheduler->processes[pid];
+    process_t *parent = scheduler->processes[process->parent_pid];
+    if (parent != NULL && parent->status == BLOCKED && parent->waiting_for_pid == process->pid) {
+        unblockProcess(process->parent_pid);
+    }
+    uint8_t contextSwitch = scheduler->processes[pid]->status == RUNNING;
+
+    removeProcess(pid);
+
+    if (contextSwitch) {
+        yield();
+    }
+
+    return 0;
 }
 
 
@@ -162,12 +183,19 @@ int32_t killCurrentProcess(void) {
 
 
 int blockProcess(uint16_t pid) {
-
+    return sleepBlock(pid, 0);
 }
 
 
 int unblockProcess(uint16_t pid) {
+    if (scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL || scheduler->processes[pid]->status != BLOCKED) {
+        return -1;
+    }
 
+    remove_sleeping_process(pid);
+    scheduler->processes[pid]->status = READY;
+
+    return 0;
 }
 
 
@@ -209,7 +237,22 @@ process_info_t* processStatus(void) {
 
 
 void myExit(int64_t retValue) {
+    if (scheduler == NULL) {
+        return;
+    }
+	
+	process_t *currentProcess = scheduler->processes[scheduler->current];
+    
+	currentProcess->status = TERMINATED;
+	currentProcess->return_value = retValue;
+	remove_sleeping_process(currentProcess->pid);
 
+	process_t *parent = scheduler->processes[currentProcess->parent_pid];
+	if (parent != NULL && parent->status == BLOCKED &&
+		parent->waiting_for_pid == currentProcess->pid) {
+		unblockProcess(parent->pid);
+	}
+	yield();
 }
 
 
@@ -243,18 +286,44 @@ void getFds(int* fds) {
 }
 
 
-int sleepBlock(uint16_t pid, uint8_t time) {
+int sleepBlock(uint16_t pid, uint8_t sleep) {
+    if (pid == 0 || scheduler == NULL || scheduler->processes[pid] == NULL || scheduler->processes[pid]->status == TERMINATED) {
+        return -1;
+    }
 
+    if (sleep == 0) {
+        remove_sleeping_process(pid);
+    }
+
+    uint8_t contextSwitch = pid == scheduler->current;
+	scheduler->processes[pid]->status = BLOCKED;
+
+	if (contextSwitch) {
+		yield();
+	}
+	return 0;
 }
 
 
 void killForegroundProcess(void) {
-
+    if (scheduler == NULL) {
+        return;
+    }
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        if (scheduler->processes[i] != NULL && scheduler->processes[SHELL_PID]->waiting_for_pid == i) {
+            killProcess(i);
+            return;
+        }
+    }
 }
 
 
 void updateStdinWait(uint8_t value) {
-
+    if (scheduler == NULL || scheduler->current == NO_PID) {
+        return;
+    }
+    process_t *currentProcess = scheduler->processes[scheduler->current];
+    currentProcess->waiting_for_stdin = value;
 }
 
 

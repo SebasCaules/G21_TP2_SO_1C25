@@ -8,7 +8,7 @@
  * This function is called by the interrupt handler to update the system's tick count
  * and manage any scheduled timer events.
  */
-void timer_handler();
+uint64_t timer_handler(uint64_t rsp);
 
 /**
  * @brief Retrieves the number of ticks that have elapsed since the timer was started.
@@ -27,5 +27,9 @@ int seconds_elapsed();
  * @return The number of milliseconds elapsed.
  */
 uint64_t ms_elapsed();
+
+void init_sleeping_processes();
+void remove_sleeping_process(uint32_t pid);
+void sleep(uint64_t sleep_ticks);
 
 #endif
