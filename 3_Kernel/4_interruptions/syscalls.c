@@ -28,7 +28,8 @@ syscall_fn syscall_table[] = {
     (syscall_fn)sys_reset_cursor,      // 8
     (syscall_fn)sys_get_regs,          // 9
     (syscall_fn)sys_beep,              // 10
-    (syscall_fn)sys_draw_pixel         // 11
+    (syscall_fn)sys_draw_pixel,        // 11
+    (syscall_fn)sys_exit               // 12
 };
 
 uint64_t sysCallHandler(Registers * regs) {
@@ -120,4 +121,9 @@ uint64_t sys_beep(uint64_t freq, uint64_t milliseconds) {
 uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color) {
     putPixel(color, x, y);
     return 0;
+}
+
+int64_t sys_exit(int64_t retValue) {
+    // hacer funcion exit en scheduler y correrla aca
+    return 1;
 }

@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 void * memset(void * destination, int32_t c, uint64_t length)
 {
@@ -55,6 +56,16 @@ int strlength(const char *str) {
         len++;
     }
     return len;
+}
+
+void strncopy(char *dest, const char *src, uint64_t size) {
+	uint64_t i;
+	for (i = 0; i < size && src[i] != '\0'; i++) {
+		dest[i] = src[i];
+	}
+	for (; i < size; i++) {
+		dest[i] = '\0';
+	}
 }
 
 void reverse(char *str) {

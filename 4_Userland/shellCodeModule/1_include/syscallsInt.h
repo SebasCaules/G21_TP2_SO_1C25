@@ -105,4 +105,10 @@ uint64_t sys_beep(uint64_t freq, uint64_t milliseconds);
  */
 uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color);
 
+/**
+ * @brief Exits the current process with a specified return value.
+ * @param retValue The return value of the process.
+ */
+int64_t sys_exit(int64_t retValue);
+
 #endif

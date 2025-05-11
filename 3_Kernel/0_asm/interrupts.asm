@@ -17,6 +17,7 @@ GLOBAL _irq80Handler
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
 GLOBAL getSnap
+GLOBAL setup_stack_frame
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
@@ -212,6 +213,25 @@ _irq80Handler:
 	popStateNoRAX
 	add rsp, 8
 	iretq
+
+
+setup_stack_frame:
+	mov r8, rsp
+	mov r9, rbp
+	mov rsp, rdx
+	mov rbp, rdx
+	push 0x0
+	push rdx
+	push 0x202
+	push 0x8
+	push rdi
+	mov rdi, rsi
+	mov rsi, rcx
+	pushState
+	mov rax, rsp
+	mov rsp, r8
+	mov rbp, r9
+	ret
 
 
 ;Zero Division Exception

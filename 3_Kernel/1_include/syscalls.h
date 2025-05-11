@@ -131,5 +131,11 @@ uint64_t sys_beep(uint64_t freq, uint64_t milliseconds);
  */
 uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color);
 
+/**
+ * @brief Retrieves the current state of the CPU registers and stores it in a snapshot.
+ * @param snapshot Pointer to a Snapshot structure where the register values will be stored.
+ */
+int64_t sys_exit(int64_t retValue);
+
 #endif // !SYSCALLS_H
 

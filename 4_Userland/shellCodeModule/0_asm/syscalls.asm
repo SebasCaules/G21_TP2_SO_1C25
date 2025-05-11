@@ -11,6 +11,8 @@ GLOBAL sys_get_regs
 GLOBAL sys_beep
 GLOBAL sys_draw_pixel
 
+GLOBAL sys_exit
+
 section .text
 
 %macro pushState 0
@@ -128,3 +130,6 @@ sys_beep:
 
 sys_draw_pixel:
     sys_handler 11
+
+sys_exit:
+    sys_handler 12

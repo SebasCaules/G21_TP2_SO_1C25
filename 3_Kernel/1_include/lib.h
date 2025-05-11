@@ -10,6 +10,8 @@ char *cpuVendor(char *result);
 
 int strlength(const char *str);
 
+void strncopy(char *dest, const char *src, uint64_t size);
+
 char * itoaHex(uint64_t num, char * str);
 
 #endif
