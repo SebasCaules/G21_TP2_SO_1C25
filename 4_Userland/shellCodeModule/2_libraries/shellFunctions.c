@@ -1,5 +1,6 @@
 #include <shellFunctions.h>
 #include <stdLib.h>
+#include <testMM.h>
 
 static void toUtcMinus3(time_struct * time);
 
@@ -28,7 +29,8 @@ static module modules[] = {
     {"piano", pianoInterface},
     {"getregs", getRegs},
     {"opcode", opCode},
-    {"divzero", divZero}
+    {"divzero", divZero},
+    {"testmm", testMM}
 };
 
 void help() {
@@ -44,6 +46,7 @@ void help() {
     puts("  getregs         - Display the registers's contents.");
     puts("  divzero         - Throws division by zero exc.");
     puts("  opcode          - Throws invalid opcode exc.");
+    puts("  testmm          - Test the memory manager.");
 }
 
 void showTime() {
@@ -160,6 +163,20 @@ void getCmdInput() {
             return;
         }
         printf(convert(words[1][0], words[2][0], words[3]));
+        return;
+    }
+
+    if(strcmp(words[0], modules[11].name) == 0) {
+        if (wordCount != 2) {
+            puts("Usage: testmm <max_memory>");
+            return;
+        }
+
+        char* argv[2];
+        argv[0] = words[0];      // "testmm"
+        argv[1] = words[1];      // e.g., "1024"
+
+        printf("%d: ret test_mm\n", testMM(argv, 2));
         return;
     }
 

@@ -146,4 +146,13 @@ void beep(int freq, int milliseconds);
  */
 char* convert(char initBase, char finalBase, char* num);
 
+// Cambiar por strToInt
+int64_t satoi (char * str, int64_t * flag);
+
+void * my_malloc(uint64_t size);
+
+void my_free(void *ptr);
+
+uint16_t getPid();
+
 #endif //TPE_ARQUI_STDLIB_H

@@ -8,7 +8,7 @@
 
 #define WELCOME_MESSAGE "Welcome to ChabonOS, %s!\n"
 #define PROMPT "%s@userland ~ $ "
-#define NUM_MODULES 11
+#define NUM_MODULES 12
 
 #define MAX_COMMAND_LENGTH 128
 #define MAX_USERNAME_LENGTH 32
@@ -69,3 +69,4 @@ void getCmdInput();
  * @brief Initializes and starts the shell environment.
  */
 void initShell();
+

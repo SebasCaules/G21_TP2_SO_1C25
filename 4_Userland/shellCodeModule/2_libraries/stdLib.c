@@ -323,3 +323,50 @@ char* convert(char initBase, char finalBase, char *num) {
     }
     return bufferRet;
 }
+
+
+//Cambiar opr StrToInt
+int64_t satoi (char * str, int64_t * flag) {
+	uint64_t i = 0;
+	int64_t res = 0;
+	int8_t sign = 1;
+
+	if ( !str ) {
+		if ( flag ) {
+			*flag = 0;
+		}
+		return 0;
+	}
+
+	if ( str[i] == '-' ) {
+		i++;
+		sign = -1;
+	}
+
+	for ( ; str[i] != '\0'; ++i ) {
+		if ( str[i] < '0' || str[i] > '9' ) {
+			if ( flag ) {
+				*flag = 0;
+			}
+			return 0;
+		}
+
+		res = res * 10 + str[i] - '0';
+	}
+	if ( flag ) {
+		*flag = 1;
+	}
+	return res * sign;
+}
+
+void * my_malloc(uint64_t size) {
+    return sys_my_malloc(size);
+}
+
+void my_free(void *ptr) {
+    return sys_my_free(ptr);
+}
+
+uint16_t getPid() {
+    return sys_get_pid();
+}

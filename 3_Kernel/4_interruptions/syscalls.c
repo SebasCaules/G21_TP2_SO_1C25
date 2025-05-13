@@ -62,7 +62,7 @@ uint64_t sysCallHandler(Registers * regs) {
     return 0;
 }
 
-uint64_t sys_sleep(uint64_t milliseconds) {
+int64_t sys_sleep(uint64_t milliseconds) {
     unsigned long long initial_time = ms_elapsed();
     unsigned long long currentTime = initial_time;
     _sti();
@@ -117,48 +117,48 @@ int64_t sys_draw_rectangle(uint64_t x, uint64_t y, uint64_t width, uint64_t heig
     return 0;
 }
 
-uint64_t sys_tick() {
+int64_t sys_tick() {
     return ticks_elapsed();
 }
 
-uint64_t sys_reset_cursor() {
+int64_t sys_reset_cursor() {
     resetCursor();
     return 0;
 }
 
-uint64_t sys_get_regs(uint64_t * r) {
+int64_t sys_get_regs(uint64_t * r) {
     return getRegisters(r);
 }
 
-uint64_t sys_beep(uint64_t freq, uint64_t milliseconds) {
+int64_t sys_beep(uint64_t freq, uint64_t milliseconds) {
     beep(freq, milliseconds);
     return 0;
 }
 
-uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color) {
+int64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color) {
     putPixel(color, x, y);
     return 0;
 }
 
 // Memory Manager related syscalls
 
-void *sys_my_malloc(uint32_t size) {
-    return my_malloc(size);
+int64_t sys_my_malloc(uint64_t size) {
+    return (uint64_t) my_malloc(size);
 }
 
-uint16_t sys_my_free(void *ptr) {
-    my_free(ptr);
+int64_t sys_my_free(uint64_t ptr) {
+    my_free((void *) ptr);
     return 0;
 }
 
-mem_info_t *sys_mem_dump() {
-    return mem_dump();
+int64_t sys_mem_dump() {
+    return (uint64_t) mem_dump();
 }
 
 // Scheduler related syscalls
 
-int64_t sys_new_process(entry_point_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
-    return addProcess(main, argv, name, unkillable, fileDescriptors);
+int64_t sys_new_process(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
+    return addProcess((entry_point_t) main, argv, name, unkillable, fileDescriptors);
 }
 
 int64_t sys_exit(int64_t retValue) {
@@ -166,31 +166,31 @@ int64_t sys_exit(int64_t retValue) {
     return 0;
 }
 
-uint16_t sys_get_pid(void) {
+int64_t sys_get_pid(void) {
     return getPid();
 }
 
-process_info_t* sys_process_status(void) {
-    return processStatus();
+int64_t sys_process_status(void) {
+    return (uint64_t) processStatus();
 }
 
-int32_t sys_kill_process(uint16_t pid) {
+int64_t sys_kill_process(uint16_t pid) {
     return killProcess(pid);
 }
 
-int sys_set_priority(uint16_t pid, uint8_t priority) {
+int64_t sys_set_priority(uint16_t pid, uint8_t priority) {
     return setPriority(pid, priority);
 }
 
-int sys_block_process(uint16_t pid) {
+int64_t sys_block_process(uint16_t pid) {
     return blockProcess(pid);
 }
 
-int sys_unblock_process(uint16_t pid) {
+int64_t sys_unblock_process(uint16_t pid) {
     return unblockProcess(pid);
 }
 
-uint16_t sys_yield(void) {
+int64_t sys_yield() {
     yield();
     return 0;
 }

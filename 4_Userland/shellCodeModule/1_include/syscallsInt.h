@@ -14,101 +14,175 @@ typedef struct time {
 } time_struct;
 
 /**
- * @brief Retrieves the current system time.
- * @param time A pointer to a time_struct to store the current time.
- * @return 0 on success, or -1 on failure.
+ * @brief Causes the program to sleep for a specified number of milliseconds.
+ * @param milliseconds The duration to sleep, in milliseconds.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int64_t sys_sleep(uint64_t milliseconds);
+
+/**
+ * @brief Retrieves the current time and stores it in the provided time structure.
+ * @param time Pointer to a time_struct where the current time will be stored.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int64_t sys_time(time_struct* time);
 
 /**
- * @brief Sets the font scale for the display.
- * @param scale The desired font scale.
- * @return 0 on success, or -1 on failure.
- */
-int64_t sys_set_font_scale(uint64_t scale);
-
-/**
- * @brief Reads data from a file descriptor into a buffer.
+ * @brief Reads data from a specified file descriptor into a buffer.
  * @param fd The file descriptor to read from.
- * @param buffer The buffer to store the read data.
- * @param amount The number of bytes to read.
- * @return The number of bytes read, or -1 on error.
+ * @param buffer Pointer to the buffer where the read data will be stored.
+ * @param length The number of bytes to read.
+ * @return Returns the number of bytes read, or an error code on failure.
  */
-int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t amount);
+int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length);
 
 /**
- * @brief Writes data from a buffer to a file descriptor.
+ * @brief Writes data to a specified file descriptor from a buffer.
  * @param fd The file descriptor to write to.
- * @param buffer The buffer containing data to write.
- * @param amount The number of bytes to write.
- * @return The number of bytes written, or -1 on error.
+ * @param buffer Pointer to the buffer containing the data to write.
+ * @param length The number of bytes to write.
+ * @return Returns the number of bytes written, or an error code on failure.
  */
-int64_t sys_write(uint64_t fd, uint16_t * buffer, uint64_t amount);
+int64_t sys_write(uint64_t fd, uint16_t * buffer, uint64_t length);
 
 /**
- * @brief Clears the display screen.
- * @return 0 on success, or -1 on failure.
+ * @brief Clears the terminal or display screen.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int64_t sys_clear();
 
 /**
- * @brief Draws a rectangle on the screen at the specified position and size.
- * @param x The x-coordinate of the rectangle's starting point.
- * @param y The y-coordinate of the rectangle's starting point.
+ * @brief Sets the font scale for text rendering.
+ * @param scale The desired font scale.
+ * @return Returns 0 on success, or an error code on failure.
+ */
+int64_t sys_set_font_scale(uint64_t scale);
+
+/**
+ * @brief Draws a rectangle on the display at the specified position and size.
+ * @param x The x-coordinate of the rectangle's top-left corner.
+ * @param y The y-coordinate of the rectangle's top-left corner.
  * @param width The width of the rectangle.
  * @param height The height of the rectangle.
- * @param color The color of the rectangle in hexadecimal format.
- * @return 0 on success, or -1 on failure.
+ * @param color The color of the rectangle.
+ * @return Returns 0 on success, or an error code on failure.
  */
 int64_t sys_draw_rectangle(uint64_t x, uint64_t y, uint64_t width, uint64_t height, uint32_t color);
 
 /**
- * @brief Retrieves the system tick count.
- * @return The number of ticks since the system started.
+ * @brief Returns the current system tick count.
+ * @return The current tick count.
  */
-uint64_t sys_tick();
+int64_t sys_tick();
 
 /**
- * @brief Suspends execution for a specified number of milliseconds.
- * @param milliseconds The number of milliseconds to sleep.
- * @return 0 on success, or -1 on failure.
+ * @brief Resets the cursor to its initial position.
+ * @return Returns 0 on success, or an error code on failure.
  */
-uint64_t sys_sleep(uint64_t milliseconds);
+int64_t sys_reset_cursor();
 
 /**
- * @brief Resets the cursor to the initial screen position.
- * @return 0 on success, or -1 on failure.
+ * @brief Retrieves the current state of the CPU registers.
+ * @param r Pointer to a buffer where the register values will be stored.
+ * @return Returns 0 on success, or an error code on failure.
  */
-uint64_t sys_reset_cursor();
+int64_t sys_get_regs(uint64_t * r);
 
 /**
- * @brief Retrieves the values of the system's general-purpose registers.
- * @param r A pointer to an array to store register values.
- * @return 0 on success, or -1 on failure.
+ * @brief Produces a beep sound at a specified frequency for a specified duration.
+ * @param freq The frequency of the beep in Hertz.
+ * @param milliseconds The duration of the beep in milliseconds.
+ * @return Returns 0 on success, or an error code on failure.
  */
-uint64_t sys_get_regs(uint64_t * r);
-
-/**
- * @brief Plays a sound using the system speaker at a given frequency and duration.
- * @param freq The frequency of the sound in Hertz.
- * @param milliseconds The duration of the sound in milliseconds.
- * @return 0 on success, or -1 on failure.
- */
-uint64_t sys_beep(uint64_t freq, uint64_t milliseconds);
+int64_t sys_beep(uint64_t freq, uint64_t milliseconds);
 
 /**
  * @brief Draws a pixel on the screen at a specified (x, y) position with a given color.
  * @param x The x-coordinate of the pixel position.
  * @param y The y-coordinate of the pixel position.
  * @param color The color of the pixel in hexadecimal format (e.g., 0xRRGGBB).
- * @return 0 on success, or -1 on failure.
+ * @return 0
  */
-uint64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color);
+int64_t sys_draw_pixel(uint64_t x, uint64_t y, uint32_t color);
+
+// Memory Manager related syscalls
+int64_t sys_my_malloc(uint64_t size);
+
+int64_t sys_my_free(uint64_t ptr);
+
+int64_t sys_mem_dump();
 
 /**
- * @brief Exits the current process with a specified return value.
- * @param retValue The return value of the process.
+ * @brief Creates and schedules a new process in the system.
+ * @param main Entry point function of the process.
+ * @param argv Arguments passed to the process.
+ * @param name Name of the process.
+ * @param unkillable If set to 1, the process cannot be killed.
+ * @param fileDescriptors Initial file descriptors for the process.
+ * @return The PID of the new process on success, or -1 on failure.
  */
+int64_t sys_new_process(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
+
+/**
+ * @brief Retrieves the current state of the CPU registers and stores it in a snapshot.
+ * @param snapshot Pointer to a Snapshot structure where the register values will be stored.
+ */
+
 int64_t sys_exit(int64_t retValue);
+
+/**
+ * @brief Gets the PID of the currently executing process.
+ * @return The PID of the current process.
+ */
+int64_t sys_get_pid(void);
+
+/**
+ * @brief Returns an array of information about all current processes.
+ * @return A pointer to an array of process_info_t structures.
+ */
+int64_t sys_process_status(void);
+
+/**
+ * @brief Terminates the process with the given PID.
+ * @param pid The PID of the process to terminate.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int64_t sys_kill_process(uint16_t pid);
+
+/**
+ * @brief Sets the priority of a process.
+ * @param pid The PID of the process.
+ * @param newPriority The new priority value.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int64_t sys_set_priority(uint16_t pid, uint8_t newPriority);
+
+/**
+ * @brief Blocks a process from being scheduled.
+ * @param pid The PID of the process to block.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int64_t sys_block_process(uint16_t pid);
+
+/**
+ * @brief Unblocks a previously blocked process.
+ * @param pid The PID of the process to unblock.
+ * @return 0 on success, or -1 if the PID is invalid.
+ */
+int64_t sys_unblock_process(uint16_t pid);
+
+/**
+ * @brief Terminates the currently executing process.
+ * @return 0 on success
+ */
+int64_t sys_yield(void);
+
+/**
+ * @brief Waits for a process with a specific PID to terminate.
+ * @param pid The PID of the process to wait for.
+ * @return The return value of the terminated process, or -1 on error.
+ */
+int64_t sys_waitpid(uint32_t pid);
+
 
 #endif

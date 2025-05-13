@@ -25,3 +25,18 @@ ls
 cd root
 ls
 exit
+ls
+cd root
+cd 3_Kernel/
+cd 5_tests/
+ls
+make all
+clear
+make all
+make all
+make all
+make all
+docker exit
+ls
+make all
+exit
