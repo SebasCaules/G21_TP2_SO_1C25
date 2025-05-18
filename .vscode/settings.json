@@ -17,6 +17,8 @@
         "memorymap.h": "c",
         "testpriority.h": "c",
         "testlib.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "scheduler.h": "c",
+        "testprocess.h": "c"
     }
 }

@@ -161,13 +161,13 @@ sys_new_process:
 sys_exit:
     sys_handler 16
 
-sys_get_pid:
+sys_kill_process:
     sys_handler 17
 
-sys_process_status:
+sys_get_pid:
     sys_handler 18
 
-sys_kill_process:
+sys_process_status:
     sys_handler 19
 
 sys_set_priority:

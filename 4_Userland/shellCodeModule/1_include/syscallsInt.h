@@ -186,5 +186,6 @@ int64_t sys_yield(void);
  */
 int64_t sys_waitpid(uint32_t pid);
 
+int64_t sys_get_size();
 
 #endif

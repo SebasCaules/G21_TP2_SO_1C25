@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "process.h"
 
-#define MAX_PROCESSES 5
+#define MAX_PROCESSES 64
 #define MAX_PRIORITY 4
 #define MIN_PRIORITY 1
 

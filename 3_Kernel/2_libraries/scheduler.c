@@ -11,7 +11,7 @@
 #define SHELL_PID 1
 
 typedef struct scheduler_t {
-    process_t* processes[MAX_PROCESSES];
+    process_t* processes[MAX_PROCESSES + 1];
     uint16_t current;
     uint8_t size;
 } scheduler_t;
@@ -80,21 +80,12 @@ void* schedule(void* prevRSP) {
 
 
 int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
-    // if (scheduler == NULL || scheduler->size >= MAX_PROCESSES || fileDescriptors == NULL) {
-    //     return 2;
-    // }
-    if (scheduler == NULL) {
-        return -2;
-    }
-    if (scheduler->size >= MAX_PROCESSES) {
-        return -3;
-    }
-    if (fileDescriptors == NULL) {
-        return -4;
+    if (scheduler == NULL || scheduler->size >= MAX_PROCESSES || fileDescriptors == NULL) {
+        return -1;
     }
 
 
-    uint16_t pid= NO_PID;
+    uint16_t pid = NO_PID;
     for (int i = 0; i < MAX_PROCESSES; i++) {
         if (scheduler->processes[i] == NULL) {
             pid = i;
@@ -168,7 +159,7 @@ int32_t killProcess(uint16_t pid) {
     if (scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL || scheduler->processes[pid]->unkillable) {
         return -1;
     }
-
+    
     adoptChildren(pid);
     process_t *process = scheduler->processes[pid];
     process_t *parent = scheduler->processes[process->parent_pid];
@@ -176,13 +167,12 @@ int32_t killProcess(uint16_t pid) {
         unblockProcess(process->parent_pid);
     }
     uint8_t contextSwitch = scheduler->processes[pid]->status == RUNNING;
-
+    remove_sleeping_process(pid);
     removeProcess(pid);
 
     if (contextSwitch) {
         yield();
     }
-
     return 0;
 }
 
@@ -250,19 +240,21 @@ void myExit(int64_t retValue) {
     if (scheduler == NULL) {
         return;
     }
-	
-	process_t *currentProcess = scheduler->processes[scheduler->current];
     
-	currentProcess->status = TERMINATED;
-	currentProcess->return_value = retValue;
-	remove_sleeping_process(currentProcess->pid);
+    process_t *currentProcess = scheduler->processes[scheduler->current];
+    
+    currentProcess->status = TERMINATED;
+    currentProcess->return_value = retValue;
+    remove_sleeping_process(currentProcess->pid);
 
-	process_t *parent = scheduler->processes[currentProcess->parent_pid];
-	if (parent != NULL && parent->status == BLOCKED &&
-		parent->waiting_for_pid == currentProcess->pid) {
-		unblockProcess(parent->pid);
-	}
-	yield();
+    process_t *parent = scheduler->processes[currentProcess->parent_pid];
+    if (parent != NULL && parent->status == BLOCKED &&
+        parent->waiting_for_pid == currentProcess->pid) {
+        unblockProcess(parent->pid);
+    }
+
+    removeProcess(currentProcess->pid); // Eliminar el proceso correctamente
+    yield();
 }
 
 
@@ -407,12 +399,9 @@ static void adoptChildren(int16_t pid) {
 
 static void removeProcess(uint16_t pid) {
     if (scheduler->processes[pid] == NULL) {
-        return;
+        return; // Proceso ya eliminado
     }
     destroyProcess(scheduler->processes[pid]);
-    scheduler->processes[pid] == NULL;
+    scheduler->processes[pid] = NULL;
     scheduler->size--;
 }
-
-
-
