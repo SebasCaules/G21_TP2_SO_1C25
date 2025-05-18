@@ -153,6 +153,27 @@ void * my_malloc(uint64_t size);
 
 void my_free(void *ptr);
 
-uint16_t getPid();
+int64_t newProcess(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
+
+int64_t exit(int64_t retValue);
+
+int64_t getPid(void);
+
+int64_t processStatus(void);
+
+int64_t kill(uint64_t pid);
+
+int64_t setPriority(uint16_t pid, uint8_t newPriority);
+
+int64_t blockProcess(uint16_t pid);
+
+int64_t unblockProcess(uint16_t pid);
+
+int64_t yield(void);
+
+int64_t waitPid(uint32_t pid);
+
+int64_t nice(uint64_t pid, uint64_t newPriority);
+
 
 #endif //TPE_ARQUI_STDLIB_H

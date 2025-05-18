@@ -80,11 +80,21 @@ void* schedule(void* prevRSP) {
 
 
 int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
-    if (scheduler == NULL || scheduler->size >= MAX_PROCESSES || fileDescriptors == NULL) {
-        return NO_PID;
+    // if (scheduler == NULL || scheduler->size >= MAX_PROCESSES || fileDescriptors == NULL) {
+    //     return 2;
+    // }
+    if (scheduler == NULL) {
+        return -2;
+    }
+    if (scheduler->size >= MAX_PROCESSES) {
+        return -3;
+    }
+    if (fileDescriptors == NULL) {
+        return -4;
     }
 
-    uint16_t pid = NO_PID;
+
+    uint16_t pid= NO_PID;
     for (int i = 0; i < MAX_PROCESSES; i++) {
         if (scheduler->processes[i] == NULL) {
             pid = i;
@@ -95,7 +105,7 @@ int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillab
         return -1;
     }
 
-    uint16_t parentPid = (scheduler->current == NO_PID) ? scheduler->current : NO_PID;
+    uint16_t parentPid = (scheduler->current != NO_PID) ? scheduler->current : NO_PID;
 
     process_t *newProcess = createProcess(
         pid,
@@ -287,8 +297,17 @@ void getFds(int* fds) {
 
 
 int sleepBlock(uint16_t pid, uint8_t sleep) {
-    if (pid == 0 || scheduler == NULL || scheduler->processes[pid] == NULL || scheduler->processes[pid]->status == TERMINATED) {
-        return -1;
+    if (pid == 0) {
+        return -2;
+    }
+    if (scheduler == NULL) {
+        return -3;
+    }
+    if (scheduler->processes[pid] == NULL) {
+        return -4;
+    }
+    if (scheduler->processes[pid]->status == TERMINATED) {
+        return -5;
     }
 
     if (sleep == 0) {

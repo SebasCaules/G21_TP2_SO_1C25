@@ -367,6 +367,46 @@ void my_free(void *ptr) {
     return sys_my_free(ptr);
 }
 
-uint16_t getPid() {
+int64_t newProcess(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
+    return sys_new_process(main, argv, name, unkillable, fileDescriptors);
+}
+
+int64_t exit(int64_t retValue) {
+    return sys_exit(retValue);
+}
+
+int64_t getPid(void) {
     return sys_get_pid();
+}
+
+int64_t processStatus(void) {
+    return sys_process_status();
+}
+
+int64_t kill(uint64_t pid) {
+    return sys_kill_process((uint16_t)pid);
+}
+
+int64_t setPriority(uint16_t pid, uint8_t newPriority) {
+    return sys_set_priority(pid, newPriority);
+}
+
+int64_t blockProcess(uint16_t pid) {
+    return sys_block_process(pid);
+}
+
+int64_t unblockProcess(uint16_t pid) {
+    return sys_unblock_process(pid);
+}
+
+int64_t yield(void) {
+    return sys_yield();
+}
+
+int64_t waitPid(uint32_t pid) {
+    return sys_waitpid(pid);
+}
+
+int64_t nice(uint64_t pid, uint64_t newPriority) {
+	return setPriority(pid, newPriority);
 }

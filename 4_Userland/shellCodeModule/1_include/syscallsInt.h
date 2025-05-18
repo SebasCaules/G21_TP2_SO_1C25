@@ -13,6 +13,8 @@ typedef struct time {
 
 } time_struct;
 
+typedef int (*EntryPoint)(int argc, char **argv);
+
 /**
  * @brief Causes the program to sleep for a specified number of milliseconds.
  * @param milliseconds The duration to sleep, in milliseconds.
@@ -121,7 +123,7 @@ int64_t sys_mem_dump();
  * @param fileDescriptors Initial file descriptors for the process.
  * @return The PID of the new process on success, or -1 on failure.
  */
-int64_t sys_new_process(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
+int64_t sys_new_process(EntryPoint main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
 
 /**
  * @brief Retrieves the current state of the CPU registers and stores it in a snapshot.

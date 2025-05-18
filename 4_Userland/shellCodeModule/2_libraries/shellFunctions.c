@@ -1,6 +1,5 @@
 #include <shellFunctions.h>
 #include <stdLib.h>
-#include <testMM.h>
 
 static void toUtcMinus3(time_struct * time);
 
@@ -30,7 +29,9 @@ static module modules[] = {
     {"getregs", getRegs},
     {"opcode", opCode},
     {"divzero", divZero},
-    {"testmm", testMM}
+    {"testmm", testMM},
+    {"testproc", testProcess},
+    {"testprio", testPriority}
 };
 
 void help() {
@@ -47,6 +48,8 @@ void help() {
     puts("  divzero         - Throws division by zero exc.");
     puts("  opcode          - Throws invalid opcode exc.");
     puts("  testmm          - Test the memory manager.");
+    puts("  testproc        - Test the process manager.");
+    puts("  testprio        - Test the priority manager.");
 }
 
 void showTime() {
@@ -177,6 +180,19 @@ void getCmdInput() {
         argv[1] = words[1];      // e.g., "1024"
 
         printf("%d: ret test_mm\n", testMM(argv, 2));
+        return;
+    }
+
+    if(strcmp(words[0], modules[12].name) == 0) {
+        if (wordCount != 2) {
+            puts("Usage: testproc <max_processes>");
+            return;
+        }
+
+        char* argv[1];
+        argv[0] = words[1]; // e.g., "5"
+
+        printf("%d: ret test_proc\n", testProcess(1, argv));
         return;
     }
 
