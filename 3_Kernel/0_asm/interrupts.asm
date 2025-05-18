@@ -18,6 +18,7 @@ GLOBAL _exception0Handler
 GLOBAL _exception6Handler
 GLOBAL getSnap
 GLOBAL setup_stack_frame
+GLOBAL timer_tick
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
@@ -180,6 +181,9 @@ picSlaveMask:
     pop     rbp
     retn
 
+timer_tick:
+	int 20h
+	ret
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:

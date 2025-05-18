@@ -17,6 +17,7 @@ typedef struct scheduler_t {
 } scheduler_t;
 
 extern void _hlt();
+extern void timer_tick();
 
 static schedulerADT scheduler = NULL;
 
@@ -138,8 +139,7 @@ Qué debería hacer:
 * Puede ser tan simple como llamar a schedule(current_rsp); y hacer un return de ahí si el sistema lo permite.
 */
 void yield(void) {
-    
-
+    timer_tick();
 }
 
 
