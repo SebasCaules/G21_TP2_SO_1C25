@@ -30,8 +30,8 @@ static module modules[] = {
     {"opcode", opCode},
     {"divzero", divZero},
     {"testmm", testMM},
-    {"testproc", testProcess},
-    {"testprio", testPriority}
+    {"ts", testProcess},
+    {"tp", testPriority}
 };
 
 void help() {
@@ -48,8 +48,8 @@ void help() {
     puts("  divzero         - Throws division by zero exc.");
     puts("  opcode          - Throws invalid opcode exc.");
     puts("  testmm          - Test the memory manager.");
-    puts("  testproc        - Test the process manager.");
-    puts("  testprio        - Test the priority manager.");
+    puts("  ts <max_proc>   - Test the scheduler manager.");
+    puts("  tp              - Test the priority manager.");
 }
 
 void showTime() {
