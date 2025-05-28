@@ -31,7 +31,8 @@ static module modules[] = {
     {"divzero", divZero},
     {"testmm", testMM},
     {"ts", testProcess},
-    {"tp", testPriority}
+    {"tp", testPriority},
+    {"tsem", test_sync}
 };
 
 void help() {
@@ -50,6 +51,7 @@ void help() {
     puts("  testmm          - Test the memory manager.");
     puts("  ts <max_proc>   - Test the scheduler manager.");
     puts("  tp              - Test the priority manager.");
+    puts("  tsem            - Test the semaphore manager.");
 }
 
 void showTime() {
@@ -193,6 +195,13 @@ void getCmdInput() {
         argv[0] = words[1]; // e.g., "5"
 
         printf("%d: ret test_proc\n", testProcess(1, argv));
+        return;
+    }
+    if(strcmp(words[0], modules[14].name) == 0) {
+
+        char* argv[1];
+        argv[0] = words[1]; // e.g., "5"
+        test_sync(2, argv);
         return;
     }
 

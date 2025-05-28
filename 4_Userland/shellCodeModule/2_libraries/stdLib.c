@@ -410,3 +410,19 @@ int64_t waitPid(uint32_t pid) {
 int64_t nice(uint64_t pid, uint64_t newPriority) {
 	return setPriority(pid, newPriority);
 }
+
+int64_t semOpen(char *name, int initialValue) {
+    return sys_sem_open(name, initialValue);
+}
+
+int64_t semClose(char *name) {
+    return sys_sem_close(name);
+}
+
+int64_t semWait(char *name) {
+    return sys_sem_wait(name);
+}
+
+int64_t semPost(char *name) {
+    return sys_sem_post(name);
+}

@@ -27,6 +27,10 @@ GLOBAL sys_block_process
 GLOBAL sys_unblock_process
 GLOBAL sys_yield
 GLOBAL sys_waitpid
+GLOBAL sys_sem_open
+GLOBAL sys_sem_close
+GLOBAL sys_sem_wait
+GLOBAL sys_sem_post
 
 section .text
 
@@ -184,4 +188,16 @@ sys_yield:
 
 sys_waitpid:
     sys_handler 24
+
+sys_sem_open:
+    sys_handler 25
+
+sys_sem_close:
+    sys_handler 26
+
+sys_sem_wait:
+    sys_handler 27
+    
+sys_sem_post:
+    sys_handler 28
 

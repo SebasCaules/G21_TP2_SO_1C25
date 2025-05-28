@@ -47,6 +47,10 @@ syscall_fn syscall_table[] = {
     (syscall_fn)sys_unblock_process,   // 22
     (syscall_fn)sys_yield,             // 23
     (syscall_fn)sys_waitpid,           // 24
+    (syscall_fn)sys_sem_open,          // 25
+    (syscall_fn)sys_sem_close,         // 26
+    (syscall_fn)sys_sem_wait,          // 27
+    (syscall_fn)sys_sem_post,          // 28
 };
 
 uint64_t sysCallHandler(Registers * regs) {
@@ -197,4 +201,20 @@ int64_t sys_yield() {
 
 int64_t sys_waitpid(uint32_t pid) {
     return waitPid(pid);
+}
+
+int64_t sys_sem_open(char *name, uint64_t initialValue) {
+	return semOpen(name, initialValue);
+}
+
+int64_t sys_sem_close(char *name) {
+	return semClose(name);
+}
+
+int64_t sys_sem_wait(char *name) {
+	return semWait(name);
+}
+
+int64_t sys_sem_post(char *name) {
+	return semPost(name);
 }

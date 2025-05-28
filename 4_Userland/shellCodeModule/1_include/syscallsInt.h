@@ -188,4 +188,12 @@ int64_t sys_waitpid(uint32_t pid);
 
 int64_t sys_get_size();
 
+int64_t sys_sem_open(uint64_t sem_id, uint64_t initial_value);
+
+int64_t sys_sem_close(uint64_t sem_id);
+
+int64_t sys_sem_wait(uint64_t sem_id);
+
+int64_t sys_sem_post(uint64_t sem_id);
+
 #endif
