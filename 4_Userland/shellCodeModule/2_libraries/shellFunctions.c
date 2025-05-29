@@ -197,10 +197,17 @@ void getCmdInput() {
         printf("%d: ret test_proc\n", testProcess(1, argv));
         return;
     }
-    if(strcmp(words[0], modules[14].name) == 0) {
+    if (strcmp(words[0], modules[14].name) == 0) {
+        if (wordCount != 3) {
+            puts("Usage: tsem <n_iterations> <use_sem>");
+            return;
+        }
 
-        char* argv[1];
-        argv[0] = words[1]; // e.g., "5"
+        char *argv[2];
+        argv[0] = words[1]; // number of iterations
+        argv[1] = words[2]; // use_sem flag
+
+        printf("Running test_sync with n = %s, use_sem = %s\n", argv[0], argv[1]);
         test_sync(2, argv);
         return;
     }
