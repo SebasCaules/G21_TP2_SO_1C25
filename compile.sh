@@ -6,6 +6,13 @@ CONTAINER_NAME="SO2"
 # Start the Docker container
 docker start $CONTAINER_NAME
 
+# Verifica si el contenedor está corriendo
+RUNNING=$(docker inspect -f '{{.State.Running}}' $CONTAINER_NAME 2>/dev/null)
+if [ "$RUNNING" != "true" ]; then
+    echo "Error: el contenedor $CONTAINER_NAME no está corriendo."
+    exit 1
+fi
+
 # Clean and build the project in the specified directories
 docker exec -it $CONTAINER_NAME make clean -C /root/2_Toolchain
 docker exec -it $CONTAINER_NAME make clean -C /root
@@ -28,5 +35,5 @@ fi
 docker exec -it $CONTAINER_NAME make clean -C /root/2_Toolchain
 docker exec -it $CONTAINER_NAME make clean -C /root
 
-# Stop the Docker container
-docker stop $CONTAINER_NAME
+# # Stop the Docker container
+# docker stop $CONTAINER_NAME

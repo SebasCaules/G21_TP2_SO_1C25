@@ -206,8 +206,6 @@ void getCmdInput() {
         char *argv[2];
         argv[0] = words[1]; // number of iterations
         argv[1] = words[2]; // use_sem flag
-
-        printf("Running test_sync with n = %s, use_sem = %s\n", argv[0], argv[1]);
         test_sync(2, argv);
         return;
     }

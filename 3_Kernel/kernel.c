@@ -54,14 +54,8 @@ int main() {
 	my_mem_init(START_FREE_MEM, MEM_SIZE);
 	init_sleeping_processes();
 	initScheduler();
+	initSemManager();
 	load_idt();
-	// init_memory_manager(endOfKernel);
-
-    // Test: pedir una página
-    // void *page = alloc_page();
-    // if (page) {
-    //     // Usar la página
-    // }
 	((EntryPoint)sampleCodeModuleAddress)();
 
 	return 0;
