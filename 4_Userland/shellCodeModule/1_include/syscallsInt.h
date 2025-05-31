@@ -188,4 +188,24 @@ int64_t sys_waitpid(uint32_t pid);
 
 int64_t sys_get_size();
 
+// Synchronization related syscalls
+
+int64_t sys_sem_open(uint64_t sem_id, uint64_t initial_value);
+
+int64_t sys_sem_close(uint64_t sem_id);
+
+int64_t sys_sem_wait(uint64_t sem_id);
+
+int64_t sys_sem_post(uint64_t sem_id);
+
+// IPC related syscalls
+
+int64_t sys_create_pipe(uint64_t fds[2]);
+
+int64_t sys_destroy_pipe(uint64_t writeFd);
+
+int64_t sys_read_pipe(uint64_t fd, char *buffer, int bytes);
+
+int64_t sys_write_pipe(uint64_t fd, const char *buffer, int bytes);
+
 #endif

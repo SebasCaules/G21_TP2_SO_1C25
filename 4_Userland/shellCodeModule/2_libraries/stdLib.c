@@ -359,6 +359,8 @@ int64_t satoi (char * str, int64_t * flag) {
 	return res * sign;
 }
 
+// Memory Manager related functions
+
 void * my_malloc(uint64_t size) {
     return sys_my_malloc(size);
 }
@@ -366,6 +368,8 @@ void * my_malloc(uint64_t size) {
 void my_free(void *ptr) {
     return sys_my_free(ptr);
 }
+
+// Scheduler related functions
 
 int64_t newProcess(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
     return sys_new_process(main, argv, name, unkillable, fileDescriptors);
@@ -409,4 +413,40 @@ int64_t waitPid(uint32_t pid) {
 
 int64_t nice(uint64_t pid, uint64_t newPriority) {
 	return setPriority(pid, newPriority);
+}
+
+// Synchronization related functions
+
+int64_t semOpen(char *name, int initialValue) {
+    return sys_sem_open(name, initialValue);
+}
+
+int64_t semClose(char *name) {
+    return sys_sem_close(name);
+}
+
+int64_t semWait(char *name) {
+    return sys_sem_wait(name);
+}
+
+int64_t semPost(char *name) {
+    return sys_sem_post(name);
+}
+
+// IPC related functions
+
+int64_t createPipe(uint64_t fds[2]) {
+    return sys_create_pipe(fds);
+}
+
+int64_t destroyPipe(uint64_t writeFd) {
+    return sys_destroy_pipe(writeFd);
+}
+
+int64_t readPipe(uint64_t fd, char *buffer, int bytes) {
+    return sys_read_pipe(fd, buffer, bytes);
+}
+
+int64_t writePipe(uint64_t fd, const char *buffer, int bytes) {
+    return sys_write_pipe(fd, buffer, bytes);
 }

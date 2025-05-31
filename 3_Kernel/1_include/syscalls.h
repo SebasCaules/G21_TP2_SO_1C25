@@ -215,4 +215,12 @@ int64_t sys_waitpid(uint32_t pid);
 
 int64_t getSize();
 
+int64_t sys_create_pipe(int fds[2]);
+
+int64_t sys_destroy_pipe(int writeFd);
+
+int64_t sys_read_pipe(int fd, char *buffer, int bytes);
+
+int64_t sys_write_pipe(int fd, const char *buffer, int bytes);
+
 #endif // !SYSCALLS_H

@@ -47,6 +47,18 @@ syscall_fn syscall_table[] = {
     (syscall_fn)sys_unblock_process,   // 22
     (syscall_fn)sys_yield,             // 23
     (syscall_fn)sys_waitpid,           // 24
+
+    // Synchronization related syscalls
+    (syscall_fn)sys_sem_open,          // 25
+    (syscall_fn)sys_sem_close,         // 26
+    (syscall_fn)sys_sem_wait,          // 27
+    (syscall_fn)sys_sem_post,          // 28
+
+    // IPC related syscalls
+    (syscall_fn)sys_create_pipe,       // 29
+    (syscall_fn)sys_destroy_pipe,      // 30
+    (syscall_fn)sys_read_pipe,         // 31
+    (syscall_fn)sys_write_pipe,        // 32
 };
 
 uint64_t sysCallHandler(Registers * regs) {
@@ -197,4 +209,41 @@ int64_t sys_yield() {
 
 int64_t sys_waitpid(uint32_t pid) {
     return waitPid(pid);
+}
+
+// Synchronization related syscalls
+
+int64_t sys_sem_open(char *name, uint64_t initialValue) {
+	return semOpen(name, initialValue);
+}
+
+int64_t sys_sem_close(char *name) {
+	return semClose(name);
+}
+
+int64_t sys_sem_wait(char *name) {
+	return semWait(name);
+}
+
+int64_t sys_sem_post(char *name) {
+	return semPost(name);
+}
+
+// IPC related syscalls
+
+int64_t sys_create_pipe(int fds[2]) {
+	return createPipe(fds);
+}
+
+int64_t sys_destroy_pipe(int writeFd) {
+	destroyPipe(writeFd);
+	return 1;
+}
+
+int64_t sys_read_pipe(int fd, char *buffer, int bytes) {
+    return readPipe(fd, buffer, bytes);
+}
+
+int64_t sys_write_pipe(int fd, const char *buffer, int bytes) {
+    return writePipe(fd, buffer, bytes);
 }

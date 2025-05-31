@@ -28,6 +28,18 @@ GLOBAL sys_unblock_process
 GLOBAL sys_yield
 GLOBAL sys_waitpid
 
+; Synchronization syscalls
+GLOBAL sys_sem_open
+GLOBAL sys_sem_close
+GLOBAL sys_sem_wait
+GLOBAL sys_sem_post
+
+; IPC syscalls
+GLOBAL sys_create_pipe
+GLOBAL sys_destroy_pipe
+GLOBAl sys_read_pipe
+GLOBAL sys_write_pipe
+
 section .text
 
 %macro pushState 0
@@ -184,4 +196,30 @@ sys_yield:
 
 sys_waitpid:
     sys_handler 24
+
+; Synchronization syscalls
+sys_sem_open:
+    sys_handler 25
+
+sys_sem_close:
+    sys_handler 26
+
+sys_sem_wait:
+    sys_handler 27
+    
+sys_sem_post:
+    sys_handler 28
+
+; IPC syscalls
+sys_create_pipe:
+    sys_handler 29
+
+sys_destroy_pipe:
+    sys_handler 30
+
+sys_read_pipe:
+    sys_handler 31
+
+sys_write_pipe:
+    sys_handler 32
 
