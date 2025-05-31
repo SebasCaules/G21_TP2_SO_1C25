@@ -18,6 +18,6 @@ char *itoa(int num, char *str);
 
 int strncat(char *dest, const char *src);
 
-int strncmp(const char *s1, const char *s2);
+int strcmp(const char *s1, const char *s2);
 
 #endif

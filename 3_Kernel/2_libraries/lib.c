@@ -118,7 +118,7 @@ int strncat(char *dest, const char *src) {
 	return dest_len + i;
 }
 
-int strncmp(const char *s1, const char *s2) {
+int strcmp(const char *s1, const char *s2) {
 	while (*s1 && (*s1 == *s2)) {
 		s1++;
 		s2++;

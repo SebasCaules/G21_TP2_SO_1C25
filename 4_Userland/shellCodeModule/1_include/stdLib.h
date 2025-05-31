@@ -175,5 +175,13 @@ int64_t waitPid(uint32_t pid);
 
 int64_t nice(uint64_t pid, uint64_t newPriority);
 
+int64_t semOpen(char *name, int initialValue);
+
+int64_t semClose(char *name);
+
+int64_t semWait(char *name);
+
+int64_t semPost(char *name);
+
 
 #endif //TPE_ARQUI_STDLIB_H
