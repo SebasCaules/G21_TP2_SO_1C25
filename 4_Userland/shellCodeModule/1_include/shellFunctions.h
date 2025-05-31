@@ -13,8 +13,8 @@
 #include <testSynchro.h>
 
 #define WELCOME_MESSAGE "Welcome to ChabonOS, %s!\n"
-#define PROMPT "%s@userland ~ $ "
-#define NUM_MODULES 15
+#define PROMPT "%s@userland ~ "
+#define NUM_MODULES 16
 
 #define MAX_COMMAND_LENGTH 128
 #define MAX_USERNAME_LENGTH 32

@@ -1,6 +1,26 @@
 #include <shellFunctions.h>
 #include <stdLib.h>
 
+typedef enum {
+    BLUE = 4,
+    YELLOW,
+    CYAN,
+    MAGENTA,
+    GRAY,
+    ORANGE,
+    PURPLE,
+    BROWN,
+    PINK,
+    LIME,
+    NAVY,
+    TEAL,
+    OLIVE,
+    MAROON,
+    SILVER,
+    GOLD,
+    FDS_COUNT // Total de colores
+} fds;
+
 static void toUtcMinus3(time_struct * time);
 
 static char username[MAX_USERNAME_LENGTH] = { 0 };
@@ -13,6 +33,7 @@ void song_player();
 int isValidBase(const char *base);
 int isNumberInBase(const char *num, const char *base);
 int isConvertValid(char words[MAX_WORDS][MAX_WORD_LENGTH]);
+void colorShowcase();
 
 // // para sacar warnings
 // void noOp() {} // goes to another function
@@ -32,7 +53,8 @@ static module modules[] = {
     {"testmm", testMM},
     {"ts", testProcess},
     {"tp", testPriority},
-    {"tsem", test_sync}
+    {"tsem", test_sync},
+    {"colorshow", colorShowcase}
 };
 
 void help() {
@@ -52,6 +74,7 @@ void help() {
     puts("  ts <max_proc>   - Test the scheduler manager.");
     puts("  tp              - Test the priority manager.");
     puts("  tsem            - Test the semaphore manager.");
+    puts("  colorshow       - Show the color showcase.");
 }
 
 void showTime() {
@@ -142,6 +165,7 @@ void askForUser() {
 
 static void prompt() {
     printf(PROMPT, username);
+    fdprintf(GOLD, "$");
 }
 
 void getCmdInput() {
@@ -255,4 +279,40 @@ static void toUtcMinus3(time_struct * time) {
     else {
         time->hour = time->hour - 3;
     }
+}
+
+void colorShowcase() {
+    puts("=== Welcome to the Great Terminal Color Parade! ===\n");
+
+    const char* descriptions[] = {
+        "Silence in the court... here comes BLACK!",
+        "Bright and proud, the noble WHITE arrives.",
+        "Fiery and bold — it's RED! [FLAMES]",
+        "Sprouting life — GREEN marches in. [LEAVES]",
+        "Splashing waves — BLUE flows! [OCEAN]",
+        "Like sunshine — YELLOW shines through. [SUN]",
+        "Streaming through the sky — CYAN glides. [SKY]",
+        "A burst of color — MAGENTA dazzles. [SPARK]",
+        "Neutral observer — GRAY strolls by. [MIST]",
+        "Tangerine vibes — make way for ORANGE! [CITRUS]",
+        "A mystery in royalty — PURPLE glimmers. [CLOAK]",
+        "Down-to-earth charm — BROWN trudges by. [WOOD]",
+        "Sweet and soft — PINK prances in. [CANDY]",
+        "So bright it bites — LIME lights up! [ZEST]",
+        "Dark and deep — NAVY sails past. [ANCHOR]",
+        "Quiet and cool — TEAL tiptoes in. [WAVE]",
+        "Old school — OLIVE nods wisely. [LEAF]",
+        "Passion and power — MAROON roars. [BEAT]",
+        "Polished and chic — SILVER sparkles. [GEM]",
+        "Regal and radiant — GOLD concludes the parade! [CROWN]"
+    };
+
+    for (int i = STDIN; i < FDS_COUNT; i++) {
+        printf("[*] ");
+        fdprintf(i, descriptions[i - STDIN]);
+        putchar('\n');
+    }
+
+    puts("\n=== End of Color Parade ===");
+    puts("Use these color codes to make your shell stylish and expressive.");
 }

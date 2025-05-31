@@ -108,6 +108,14 @@ char *itoa(int num, char *str) {
 	return str;
 }
 
+size_t strlen(const char *str) {
+	size_t len = 0;
+	while (str[len] != 0) {
+		len++;
+	}
+	return len;
+}
+
 int strncat(char *dest, const char *src) {
 	size_t dest_len = strlen(dest);
 	size_t i;

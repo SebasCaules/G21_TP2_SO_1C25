@@ -5,13 +5,29 @@
 #include "scheduler.h"
 #include "process.h"
 #include "memoryManager.h"
-
 typedef enum {
     STDIN = 0,
     STDOUT,
     STDERR,
     STDMARK,
-} fileDesc;
+    BLUE,
+    YELLOW,
+    CYAN,
+    MAGENTA,
+    GRAY,
+    ORANGE,
+    PURPLE,
+    BROWN,
+    PINK,
+    LIME,
+    NAVY,
+    TEAL,
+    OLIVE,
+    MAROON,
+    SILVER,
+    GOLD,
+    FDS_COUNT // Total de colores
+} fds;
 
 typedef struct time {
     uint8_t year;
