@@ -14,4 +14,10 @@ void strncopy(char *dest, const char *src, uint64_t size);
 
 char * itoaHex(uint64_t num, char * str);
 
+char *itoa(int num, char *str);
+
+int strncat(char *dest, const char *src);
+
+int strncmp(const char *s1, const char *s2);
+
 #endif

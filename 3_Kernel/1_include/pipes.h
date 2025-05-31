@@ -3,7 +3,7 @@
 
 #include <lib.h>
 #include <memoryManager.h>
-#include <semaphore.h>
+#include <synchro.h>
 #include <stddef.h>
 
 #define MAX_PIPES 64
