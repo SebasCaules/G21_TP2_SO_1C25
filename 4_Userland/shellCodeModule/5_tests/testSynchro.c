@@ -16,7 +16,7 @@ void slowInc(int64_t *p, int64_t inc) {
 	printf("[test_sync] slowInc: %d -> %d\n", (int)aux - inc, (int)aux);
 }
 
-uint64_t my_process_inc(uint64_t argc, char *argv[]) {
+uint64_t my_process_inc(int argc, char **argv) {
 	uint64_t n;
 	int8_t inc;
 	int8_t use_sem;
@@ -64,7 +64,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
 	return 0;
 }
 
-uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
+uint64_t test_sync(int argc, char **argv) { //{n, use_sem, 0}
 	
 	printf("test_sync: received argc = %d\n", (int)argc);
 	

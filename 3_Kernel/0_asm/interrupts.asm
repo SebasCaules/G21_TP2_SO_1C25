@@ -45,6 +45,26 @@ section .text
 	push r15
 %endmacro
 
+%macro pushStateNew 1
+    %if %1
+        push rax
+    %endif
+	push rbx
+	push rcx
+	push rdx
+	push rbp
+	push rdi
+	push rsi
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+%endmacro
+
 %macro popState 0
 	pop r15
 	pop r14
@@ -231,7 +251,7 @@ setup_stack_frame:
 	push rdi
 	mov rdi, rsi
 	mov rsi, rcx
-	pushState
+	pushStateNew 1
 	mov rax, rsp
 	mov rsp, r8
 	mov rbp, r9

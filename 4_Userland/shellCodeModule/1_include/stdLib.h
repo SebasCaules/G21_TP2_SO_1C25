@@ -7,6 +7,9 @@
 #define TPE_ARQUI_STDLIB_H
 #define VRGCLI
 
+#define ERROR -1
+#define OK 0
+
 #define EOF (-1)
 
 typedef enum {
@@ -144,7 +147,7 @@ void beep(int freq, int milliseconds);
  * @param finalBase The desired base of the number.
  * @param num The number to be converted, represented as a string.
  */
-char* convert(char initBase, char finalBase, char* num);
+char* convert(int argc, char *argv[]);
 
 // Cambiar por strToInt
 int64_t satoi (char * str, int64_t * flag);
@@ -153,7 +156,7 @@ void * my_malloc(uint64_t size);
 
 void my_free(void *ptr);
 
-int64_t newProcess(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
+int64_t newProcess(EntryPoint main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
 
 int64_t exit(int64_t retValue);
 
@@ -182,6 +185,14 @@ int64_t semClose(char *name);
 int64_t semWait(char *name);
 
 int64_t semPost(char *name);
+
+int64_t createPipe(uint64_t fds[2]);
+
+int64_t destroyPipe(uint64_t writeFd);
+
+int64_t readPipe(uint64_t fd, char *buffer, int bytes);
+
+int64_t writePipe(uint64_t fd, const char *buffer, int bytes);
 
 
 #endif //TPE_ARQUI_STDLIB_H

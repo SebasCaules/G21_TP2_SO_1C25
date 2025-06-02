@@ -3,13 +3,14 @@
 #include <process.h>
 #include <syscalls.h>
 #include <stddef.h>
+#include <syscalls.h>
 
 #define STACK_SIZE 0x1000 // 4 KiB
 
+
 extern void *setup_stack_frame(void (*wrapper)(entry_point_t, char **),
-                                entry_point_t entry_point,
-                                void *stackEnd,
-                                void *argv);
+									 entry_point_t main, void *stackEnd,
+									 void *argv);
 
 /*
 ; En assembler (_setup_stack_frame)
@@ -41,6 +42,7 @@ process_t *createProcess(
     uint16_t fd_in,
     uint16_t fd_out
 ) {
+    sys_write(STDOUT, (uint16_t *)"Creating process...\n", 20);
     process_t *p = my_malloc(sizeof(process_t));
     if (p == NULL)
         return NULL;
@@ -73,8 +75,10 @@ process_t *createProcess(
     strncopy(p->name, name, MAX_NAME_LENGTH - 1);
     p->name[MAX_NAME_LENGTH - 1] = 0;
 
+    sys_write(STDOUT, (uint16_t *)"Before setup_stack_frame\n", 26);
     // Setup the initial stack frame
-    p->stack_pointer = setup_stack_frame(&processCaller, entry_point, p->stack_pointer, (void *) p->argv);
+	p->stack_pointer = setup_stack_frame(&processCaller, entry_point, p->stack_pointer, (void *) p->argv);
+    sys_write(STDOUT, (uint16_t *)"After setup_stack_frame\n", 25);
 
     return p;
 }
@@ -151,8 +155,11 @@ static void freeArgv(char **argv) {
  * Llama a la función principal del proceso y luego termina el proceso.
  */
 void processCaller(entry_point_t main, char **args) {
+    sys_write(STDOUT, (uint16_t *)">> ENTERED processCaller\n", 26);
     int argc = argcFromArgv(args);
+    sys_write(STDOUT, (uint16_t *)">> Calling entry_point\n", 24);
     int64_t retValue = main(argc, args);
+    sys_write(STDOUT, (uint16_t *)">> Process finished, exiting\n", 28);
     // TODO: escribir sys_exit
-    // sys_exit(retValue); // Terminate the process with the return value
+    sys_exit(retValue); // Terminate the process with the return value
 }

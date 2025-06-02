@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 #ifndef TPE_ARQUI_STRLIB_H
 #define TPE_ARQUI_STRLIB_H
@@ -104,6 +105,8 @@ int isNumber(char c);
  * @return 1 if the character is a letter (a-z, A-Z), 0 otherwise.
  */
 int isCharacter(char c);
+
+char *strchr(const char *str, int c);
 
 #endif //TPE_ARQUI_STRLIB_H
 

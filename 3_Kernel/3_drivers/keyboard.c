@@ -128,8 +128,8 @@ void pressedKey(){
 unsigned char bufferNext() {
 	semWait(KEYBOARD_SEM_NAME);
 	if (eofFlag) {
-	    eofFlag = 0;
-	    return EOF;
+		eofFlag = 0;
+		return EOF;
 	}
 
 	if (nextToRead == current) {

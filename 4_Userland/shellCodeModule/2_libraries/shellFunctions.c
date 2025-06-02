@@ -25,39 +25,41 @@ static void toUtcMinus3(time_struct * time);
 
 static char username[MAX_USERNAME_LENGTH] = { 0 };
 
-void help();
-void showTime();
-void clearTerminal();
-void getRegs();
-void song_player();
+int help();
+int showTime();
+int clearTerminal();
+int getRegs();
+int song_player();
 int isValidBase(const char *base);
 int isNumberInBase(const char *num, const char *base);
 int isConvertValid(char words[MAX_WORDS][MAX_WORD_LENGTH]);
-void colorShowcase();
+int colorShowcase();
 
-// // para sacar warnings
-// void noOp() {} // goes to another function
+#define NUM_MODULES 16
+
+static uint8_t foreground = 1;
 
 static module modules[] = {
-    {"help", help},
-    {"time", showTime},
-    {"setfont", changeFontScale},
-    {"clear", clearTerminal},
-    {"convert", convert},
-    {"snake", snake},
-    {"spotify", spotifyInterface},
-    {"piano", pianoInterface},
-    {"getregs", getRegs},
-    {"opcode", opCode},
-    {"divzero", divZero},
-    {"testmm", testMM},
-    {"ts", testProcess},
-    {"tp", testPriority},
-    {"tsem", test_sync},
-    {"colorshow", colorShowcase}
+    {"help", 1, &help},
+    {"time", 1, &showTime},
+    {"setfont", 1, &changeFontScale},
+    {"clear", 1, &clearTerminal},
+    {"convert", 1, &convert},
+    {"snake", 0, (EntryPoint) &snake},
+    {"spotify", 0, (EntryPoint) &spotifyInterface},
+    {"piano", 0, (EntryPoint) &pianoInterface},
+    {"getregs", 1, &getRegs},
+    {"opcode", 1, &opCode},
+    {"divzero", 1, &divZero},
+    {"testmm", 0, (EntryPoint) &testMM},
+    {"ts", 0, (EntryPoint) &testProcess},
+    {"tp", 0, (EntryPoint) &testPriority},
+    {"tsem", 0, (EntryPoint)&test_sync},
+    {"colorshow", 1, &colorShowcase}
 };
 
-void help() {
+
+int help() {
     puts("Available Commands: ");
     puts("  help            - Shows all available commands.");
     puts("  time            - Display the current system time.");
@@ -75,29 +77,39 @@ void help() {
     puts("  tp              - Test the priority manager.");
     puts("  tsem            - Test the semaphore manager.");
     puts("  colorshow       - Show the color showcase.");
+    return OK;
 }
 
-void showTime() {
+int showTime() {
     time_struct time;
     sys_time(&time);
     toUtcMinus3(&time);
     printf("[dd/mm/yyyy] - [hh:mm:ss]\n");
     printf(" %d/%d/20%d  -  %d:%d:%d  \n", time.day, time.month, 
     time.year, time.hour, time.minutes, time.seconds); //Porque year es solo 2 digs?
-    return;
+    return OK;
 }
 
-void changeFontScale(int scale) {
-    if (setFontScale(scale) == -1) {
-        puts("Invalid command. (setfont <scale>) (1 or 2)");
+// int scale
+int changeFontScale(int argc, char *args[]) {
+    if (argc != 1) {
+        fdprintf(STDERR, "Invalid command. (setfont <scale>) (1 or 2)\n");
+        return ERROR;
     }
+    int scale = satoi(args[0], NULL);
+    if (setFontScale(scale) == -1) {
+        fdprintf(STDERR, "Invalid command. (setfont <scale>) (1 or 2)\n");
+        return ERROR;
+    }
+    return OK;
 }
 
-void clearTerminal() {
+int clearTerminal() {
     clearView();
+    return OK;
 }
 
-void spotifyInterface() {
+int spotifyInterface() {
 	clearView();
     puts("Welcome to the Spotify (clone) interface!\n");
     puts("Here is a list of our repertoire:\n");
@@ -120,19 +132,21 @@ void spotifyInterface() {
         }
     } while (c[0] != 'q');
     clearView();
+    return OK;
 }
 
-void pianoInterface() {
+int pianoInterface() {
     clearView();
     puts("Welcome to the piano simulator interface!\n");
     puts("The piano starts at the middle C octave, C4. Play the keys while holding SHIFT to increase the octave by one.\n");
     puts("\'W\':C, \'E\':D, \'R\':E, \'T\':F, \'Y\':G, \'U\':A, \'I\':B, \'O\':C\n");
     puts("\'3\':C#, \'4\':D#, \'6\':F#, \'7\':G#, \'8\':A#\n");
-    playKeys();
+    // playKeys();
     clearView();
+    return OK;
 }
 
-void getRegs() {
+int getRegs() {
     uint64_t r[17];
     if(sys_get_regs(r)) {
         puts("Register snapshot:");
@@ -154,8 +168,10 @@ void getRegs() {
         printf("rsp: %x\n", r[15]);
         printf("rip: %x\n", r[16]);
     } else {
-        puts("There is no snapshot available");
+        fdprintf(STDERR, "There is no snapshot available.\n");
+        return ERROR;
     }
+    return OK;
 }
 
 void askForUser() {
@@ -163,85 +179,149 @@ void askForUser() {
     gets(username, MAX_USERNAME_LENGTH);
 }
 
-static void prompt() {
+void prompt() {
     printf(PROMPT, username);
     fdprintf(GOLD, "$");
 }
 
-void getCmdInput() {
-    prompt();
-    char command[MAX_COMMAND_LENGTH + 1];
-    gets(command, MAX_COMMAND_LENGTH);
+static int fillCommandAndArgs(char **command, char *args[], char *input) {
+	int argsCount = 0;
+	foreground = 1;
+	char *current = input;
+
+	while (*current == ' ') {
+		current++;
+	}
+
+	*command = current;
+
+	while (*current != 0) {
+		if (*current == '&' && (*(current + 1) == '\0' || *(current + 1) == ' ')) {
+			foreground = 0;
+			*current = 0;
+			break;
+		}
+
+		if (*current == ' ') {
+			*current = 0;
+
+			if (*(current + 1) != 0 && *(current + 1) != ' ' &&
+				*(current + 1) != '&') {
+				args[argsCount++] = current + 1;
+				if (argsCount >= MAX_ARGS) {
+					break;
+				}
+			}
+		}
+		current++;
+	}
+
+	args[argsCount] = NULL;
+	return argsCount;
+}
+
+int getCmdInput(char* command) {
     if(strlen(command) == 0){
         return;
     }
-    char words[MAX_WORDS][MAX_WORD_LENGTH];
-    int wordCount = splitString(command, words);
 
-    if (strcmp(words[0], modules[2].name) == 0) {
-        if (wordCount != 2) {
-            puts("Invalid command. (setfont <scale>) (1 or 2)");
-            return;
+    executable_command_t executable_commands[MAX_COMMANDS];
+	for (int i = 0; i < MAX_COMMANDS; i++) {
+		executable_commands[i].pid = -1;
+	}
+    
+    char *pipe_pos = strchr(command, '|');
+	size_t executable_command_count = pipe_pos == NULL ? 1 : 2;
+	if (pipe_pos) {
+        *pipe_pos = 0;
+		if (strchr(pipe_pos + 1, '|')) {
+            fdprintf(STDERR, "Error: Only one pipe is allowed.\n");
+			return ERROR;
+		}
+	};
+    
+    for (int i = 0; i < executable_command_count; i++) {
+        executable_commands[i].argc = fillCommandAndArgs(
+            &executable_commands[i].command, executable_commands[i].args, command);
+        if (executable_commands[i].argc == ERROR) {
+            return ERROR;
         }
-        changeFontScale(stringToInt(words[1]));
-        return;
-    }
-    if(strcmp(words[0], modules[4].name) == 0) {
-        if (wordCount != 4) {
-            puts("Invalid command. (convert <base1> <base2> <number>)");
-            return;
-        }
-        printf(convert(words[1][0], words[2][0], words[3]));
-        return;
-    }
-
-    if(strcmp(words[0], modules[11].name) == 0) {
-        if (wordCount != 2) {
-            puts("Usage: testmm <max_memory>");
-            return;
-        }
-
-        char* argv[2];
-        argv[0] = words[0];      // "testmm"
-        argv[1] = words[1];      // e.g., "1024"
-
-        printf("%d: ret test_mm\n", testMM(argv, 2));
-        return;
+        // if (pipe_pos)
+        // 	command = pipe_pos + 1;
     }
 
-    if(strcmp(words[0], modules[12].name) == 0) {
-        if (wordCount != 2) {
-            puts("Usage: testproc <max_processes>");
-            return;
+    if (pipe_pos) {
+		int pipefds[2];
+		if (createPipe(pipefds) == -1) {
+            fdprintf(STDERR, "Error creating pipe.\n");
+			return ERROR;
+		}
+		executable_commands[0].fds[1] = pipefds[1];
+		executable_commands[1].fds[0] = pipefds[0];
+		executable_commands[1].fds[1] = STDOUT;
+		executable_commands[0].fds[0] = STDIN;
+	}
+	else {
+		executable_commands[0].fds[0] = foreground ? STDIN : -1;
+		executable_commands[0].fds[1] = STDOUT;
+	}
+
+    for (int i = 0; i < executable_command_count; i++) {
+        uint8_t found = 0;
+        for (int j = 0; j < NUM_MODULES; j++) {
+            if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
+                found = 1;
+                if (modules[j].builtin) {
+                    printf("Executing builtin command: %s\n", executable_commands[i].command);
+                    printf("Arguments: ");
+                    for (int k = 0; k < executable_commands[i].argc; k++) {
+                        printf("%s ", executable_commands[i].args[k]);
+                    }
+                    putchar('\n');
+                    return modules[j].function(executable_commands[i].argc, executable_commands[i].args);
+                } else {
+                    for (int a = 0; a < executable_commands[i].argc; a++) {
+                        printf("arg[%d]: %s\n", a, executable_commands[i].args[a]);
+                    }
+                    executable_commands[i].pid = newProcess(
+                        modules[j].function, executable_commands[i].args,
+                        executable_commands[i].command, 0, executable_commands[i].fds);
+                    printf("Executing external command: %s\n", executable_commands[i].command);
+                    printf("pid: %d\n", executable_commands[i].pid);
+                    yield();
+                    
+                    if (executable_commands[i].pid == -1) {
+                        fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
+                        return ERROR;
+                    }
+                    printf("pid: %d\n", executable_commands[i].pid);
+                    
+                }
+                break;
+            }
         }
-
-        char* argv[1];
-        argv[0] = words[1]; // e.g., "5"
-
-        printf("%d: ret test_proc\n", testProcess(1, argv));
-        return;
-    }
-    if (strcmp(words[0], modules[14].name) == 0) {
-        if (wordCount != 3) {
-            puts("Usage: tsem <n_iterations> <use_sem>");
-            return;
-        }
-
-        char *argv[2];
-        argv[0] = words[1]; // number of iterations
-        argv[1] = words[2]; // use_sem flag
-        test_sync(2, argv);
-        return;
-    }
-
-    for(int i = 0; i < NUM_MODULES; i++){
-        if(strcmp(command,modules[i].name)==0){
-            modules[i].function();
-            return;
+        if (!found) {
+            fdprintf(STDERR, "Command not found: %s\n", executable_commands[i].command);
+            for (int j = 0; j < executable_command_count; j++) {
+                if (executable_commands[j].pid != -1) {
+                    kill(executable_commands[j].pid);
+                }
+            }
+            return ERROR;
         }
     }
+    if (foreground) {
+		for (int i = 0; i < executable_command_count; i++) {
+			if (executable_commands[i].pid != -1) {
+				waitPid(executable_commands[i].pid);
+			}
+		}
+		if (pipe_pos) {
+			destroyPipe(executable_commands[0].fds[1]);
+		}
+	}
 
-    printf("Command not found: %s\n", words[0]); // Hay que agarrar solo la primera palabra
+	return OK;
 }
 
 void initShell() {
@@ -281,7 +361,7 @@ static void toUtcMinus3(time_struct * time) {
     }
 }
 
-void colorShowcase() {
+int colorShowcase() {
     puts("=== Welcome to the Great Terminal Color Parade! ===\n");
 
     const char* descriptions[] = {
@@ -315,4 +395,5 @@ void colorShowcase() {
 
     puts("\n=== End of Color Parade ===");
     puts("Use these color codes to make your shell stylish and expressive.");
+    return OK;
 }

@@ -9,6 +9,7 @@
 #include <memoryManager.h>
 #include <time.h>
 #include "keyboard.h"
+#include "pipes.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -56,6 +57,7 @@ int main() {
 	initScheduler();
 	initSemManager();
 	initKeyboardDriver();
+	initPipes();
 	load_idt();
 	((EntryPoint)sampleCodeModuleAddress)();
 

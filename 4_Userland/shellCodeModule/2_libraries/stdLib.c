@@ -294,34 +294,44 @@ static void from_decimal(int decimal, int base, char *buffer) {
     }
 }
 
-char* convert(char initBase, char finalBase, char *num) {
+// char initBase, char finalBase, char *num
+char* convert(int argc, char *argv[]) {
+    if (argc != 3) {
+        fdprintf(STDERR, "Usage: convert <initBase> <finalBase> <num>\n", argc);
+        return ERROR;
+    }
+
+    char initBase = argv[0][0];
+    char finalBase = argv[1][0];
+    char *num = argv[2];
     int initBaseValue = get_base_from_char(initBase);
     int finalBaseValue = get_base_from_char(finalBase);
     static char bufferRet[BUFFER_SIZE];
 
     if (initBaseValue == -1 || finalBaseValue == -1) {
-        return "The initial and final base must be one of: 'b', 'o', 'd', 'h'\n";
+        fdprintf(STDERR, "The initial and final base must be one of: 'b', 'o', 'd', 'h'\n");
+        return ERROR;
     }
 
     int decimal = to_decimal(num, initBaseValue);
     if (decimal == -1) {
-        vargsToBuffer(bufferRet, "Invalid number %s for base %c\n", num, initBase);
-        return bufferRet;
+        fdprintf(STDERR, "Invalid number %s for base %c\n", num, initBase);
+        return ERROR;
     }
 
     char convertedNum[BUFFER_SIZE];
     from_decimal(decimal, finalBaseValue, convertedNum);
 
     if(finalBaseValue == 2){
-        vargsToBuffer(bufferRet, "Number %s in base %c: %sb\n", num, finalBase, convertedNum);
+        printf("Number %s in base %c: %sb\n", num, finalBase, convertedNum);
     }
     else if(finalBaseValue == 16){
-        vargsToBuffer(bufferRet, "Number %s in base %c: 0x%s\n", num, finalBase, convertedNum);
+        printf("Number %s in base %c: 0x%s\n", num, finalBase, convertedNum);
     }
     else {
-        vargsToBuffer(bufferRet, "Number %s in base %c is %s in base %c\n", num, initBase, convertedNum, finalBase);
+        printf("Number %s in base %c is %s in base %c\n", num, initBase, convertedNum, finalBase);
     }
-    return bufferRet;
+    return OK;
 }
 
 
@@ -371,7 +381,7 @@ void my_free(void *ptr) {
 
 // Scheduler related functions
 
-int64_t newProcess(uint64_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
+int64_t newProcess(EntryPoint main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
     return sys_new_process(main, argv, name, unkillable, fileDescriptors);
 }
 
