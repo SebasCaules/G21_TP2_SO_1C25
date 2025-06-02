@@ -19,6 +19,7 @@
         "testlib.h": "c",
         "time.h": "c",
         "scheduler.h": "c",
-        "testprocess.h": "c"
+        "testprocess.h": "c",
+        "process.h": "c"
     }
 }

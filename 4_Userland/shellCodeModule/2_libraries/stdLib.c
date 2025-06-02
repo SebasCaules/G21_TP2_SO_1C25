@@ -417,6 +417,10 @@ int64_t yield(void) {
     return sys_yield();
 }
 
+process_info_t* ps() {
+    return (process_info_t*)sys_ps();
+}
+
 int64_t waitPid(uint32_t pid) {
     return sys_waitpid(pid);
 }

@@ -2,6 +2,7 @@
 #include <syscallsInt.h>
 #include <strLib.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #ifndef TPE_ARQUI_STDLIB_H
 #define TPE_ARQUI_STDLIB_H
@@ -11,6 +12,28 @@
 #define OK 0
 
 #define EOF (-1)
+
+
+typedef enum {
+    P_READY,
+    P_RUNNING,
+    P_BLOCKED,
+    P_TERMINATED
+} process_status_t;
+
+#define MAX_NAME_LENGTH 64
+
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    uint16_t pid;
+    int16_t ppid;
+    uint8_t priority;
+    void *stackBase;
+    void *stackPointer;
+    bool foreground;
+    process_status_t status;
+    uint64_t cpuTicks; // para calcular el %CPU (eventualmente)
+} process_info_t;
 
 typedef enum {
 	INT_TYPE = 0,
@@ -175,6 +198,8 @@ int64_t unblockProcess(uint16_t pid);
 int64_t yield(void);
 
 int64_t waitPid(uint32_t pid);
+
+process_info_t* ps();
 
 int64_t nice(uint64_t pid, uint64_t newPriority);
 

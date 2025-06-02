@@ -188,6 +188,8 @@ int64_t sys_waitpid(uint32_t pid);
 
 int64_t sys_get_size();
 
+int64_t sys_ps();
+
 // Synchronization related syscalls
 
 int64_t sys_sem_open(uint64_t sem_id, uint64_t initial_value);
