@@ -35,7 +35,6 @@ int isNumberInBase(const char *num, const char *base);
 int isConvertValid(char words[MAX_WORDS][MAX_WORD_LENGTH]);
 int colorShowcase();
 
-#define NUM_MODULES 17
 
 static uint8_t foreground = 1;
 
@@ -63,9 +62,12 @@ static module modules[] = {
     {"ts", 0, (EntryPoint) &testProcess},
     {"tp", 0, (EntryPoint) &testPriority},
     {"tsem", 0, (EntryPoint)&test_sync},
-    {"colorshow", 1, &colorShowcase}
+    {"colorshow", 1, &colorShowcase},
+    {"ps", 0, (EntryPoint) &ps},
+    {"printA", 0, (EntryPoint) &printA},
 };
 
+#define NUM_MODULES (sizeof(modules) / sizeof(modules[0]))
 
 int help() {
     puts("Available Commands: ");

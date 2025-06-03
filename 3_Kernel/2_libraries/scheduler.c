@@ -219,7 +219,7 @@ int setPriority(uint16_t pid, uint8_t newPriority) {
     scheduler->processes[pid]->remaining_quantum = newPriority;
     return 0;
 }
-
+// static process_info_t psInfo[32 + 1];
 
 process_info_t* processStatus(void) {
     static process_info_t processInfo[MAX_PROCESSES];
@@ -238,10 +238,29 @@ process_info_t* processStatus(void) {
             info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
             info->status = proc->status;
             info->cpuTicks = 0;  // para trackear el uso de CPU (eventualmente)
+            sys_write(STDOUT, "proceso", 7);;
         }
     }
+    char ary[] = {0,0};
 
     return processInfo;
+    // int count = 0;
+	// for (int i = 0; i < MAX_PROCESSES; i++) {
+	// 	if (scheduler->processes[i] != NULL) {
+	// 		process_info_t info;
+	// 		info.pid = scheduler->processes[i]->pid;
+	// 		strncopy(info.name, scheduler->processes[i]->name, MAX_NAME_LENGTH);
+	// 		info.priority = scheduler->processes[i]->priority;
+	// 		info.stackBase = scheduler->processes[i]->stack_base;
+	// 		info.ppid = scheduler->processes[i]->parent_pid;
+	// 		info.status = scheduler->processes[i]->status;
+	// 		psInfo[count++] = info;
+	// 	}
+	// }
+	// process_info_t empty;
+	// empty.pid = -1;
+	// psInfo[count] = empty;
+	// return psInfo;
 }
 
 

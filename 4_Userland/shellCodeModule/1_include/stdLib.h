@@ -35,6 +35,9 @@ typedef struct {
     uint64_t cpuTicks; // para calcular el %CPU (eventualmente)
 } process_info_t;
 
+#define MAX_PROCESSES 256
+#define NO_PID -1
+
 typedef enum {
 	INT_TYPE = 0,
     HEX_TYPE,
@@ -199,7 +202,7 @@ int64_t yield(void);
 
 int64_t waitPid(uint32_t pid);
 
-process_info_t* ps();
+int ps(int argc, char *argv[]);
 
 int64_t nice(uint64_t pid, uint64_t newPriority);
 
