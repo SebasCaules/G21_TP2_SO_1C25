@@ -2,41 +2,12 @@
 #define SYSCALLS_H
 
 #include <stdint.h>
+
 #include "scheduler.h"
 #include "process.h"
 #include "memoryManager.h"
-typedef enum {
-    STDIN = 0,
-    STDOUT,
-    STDERR,
-    STDMARK,
-    BLUE,
-    YELLOW,
-    CYAN,
-    MAGENTA,
-    GRAY,
-    ORANGE,
-    PURPLE,
-    BROWN,
-    PINK,
-    LIME,
-    NAVY,
-    TEAL,
-    OLIVE,
-    MAROON,
-    SILVER,
-    GOLD,
-    FDS_COUNT // Total de colores
-} fds;
-
-typedef struct time {
-    uint8_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t hour;
-    uint8_t minutes;
-    uint8_t seconds;
-} time_struct;
+#include "colors.h"
+#include "timeStruct.h"
 
 typedef struct {
     uint64_t rax;

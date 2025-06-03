@@ -1,42 +1,17 @@
 #include <stdint.h>
-#include <syscallsInt.h>
 #include <strLib.h>
 #include <stdarg.h>
 #include <stdbool.h>
+
+#include "syscallsInt.h"
+#include "colors.h"
+#include "defs.h"
 
 #ifndef TPE_ARQUI_STDLIB_H
 #define TPE_ARQUI_STDLIB_H
 #define VRGCLI
 
-#define ERROR -1
-#define OK 0
-
-#define EOF (-1)
-
-
-typedef enum {
-    P_READY,
-    P_RUNNING,
-    P_BLOCKED,
-    P_TERMINATED
-} process_status_t;
-
-#define MAX_NAME_LENGTH 64
-
-typedef struct {
-    char name[MAX_NAME_LENGTH];
-    int16_t pid;
-    int16_t ppid;
-    uint8_t priority;
-    void *stackBase;
-    void *stackPointer;
-    bool foreground;
-    process_status_t status;
-    uint64_t cpuTicks; // para calcular el %CPU (eventualmente)
-} process_info_t;
-
-#define MAX_PROCESSES 256
-#define NO_PID -1
+#include "processInc.h"
 
 typedef enum {
 	INT_TYPE = 0,
@@ -48,13 +23,6 @@ typedef enum {
 	CHAR_TYPE,
 	STR_TYPE,
 } Types;
-
-typedef enum {
-	STDIN = 0,
-    STDOUT,
-    STDERR,
-    STDMARK,
-} fileDesc;
 
 
 /**

@@ -11,13 +11,10 @@
 #include <testProcess.h>
 #include <testPriority.h>
 #include <testSynchro.h>
+#include "defs.h"
 
 #define WELCOME_MESSAGE "Welcome to ChabonOS, %s!\n"
 #define PROMPT "%s@userland ~ "
-
-#define ERROR -1
-#define OK 0
-#define EXIT 1
 
 #define MAX_COMMAND_LENGTH 128
 #define MAX_USERNAME_LENGTH 32

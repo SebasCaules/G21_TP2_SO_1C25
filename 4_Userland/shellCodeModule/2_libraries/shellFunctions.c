@@ -1,25 +1,6 @@
-#include <shellFunctions.h>
 #include <stdLib.h>
-
-typedef enum {
-    BLUE = 4,
-    YELLOW,
-    CYAN,
-    MAGENTA,
-    GRAY,
-    ORANGE,
-    PURPLE,
-    BROWN,
-    PINK,
-    LIME,
-    NAVY,
-    TEAL,
-    OLIVE,
-    MAROON,
-    SILVER,
-    GOLD,
-    FDS_COUNT // Total de colores
-} fds;
+#include "shellFunctions.h"
+#include "colors.h"
 
 static void toUtcMinus3(time_struct * time);
 
@@ -386,7 +367,7 @@ int colorShowcase() {
 
     for (int i = STDIN; i < FDS_COUNT; i++) {
         printf("[*] ");
-        fdprintf(i, descriptions[i - STDIN]);
+        fdprintf(i, descriptions[i]);
         putchar('\n');
     }
 

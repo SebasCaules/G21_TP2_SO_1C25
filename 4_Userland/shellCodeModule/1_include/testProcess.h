@@ -9,11 +9,9 @@
 #include <stdLib.h>
 
 
-enum State { RUNNING, BLOCKED, KILLED };
-
 typedef struct P_rq {
   int32_t pid;
-  enum State state;
+  process_status_t state;
 } p_rq;
 
 int64_t testProcess(uint64_t argc, char *argv[]);

@@ -20,6 +20,7 @@
         "time.h": "c",
         "scheduler.h": "c",
         "testprocess.h": "c",
-        "process.h": "c"
+        "process.h": "c",
+        "stddef.h": "c"
     }
 }

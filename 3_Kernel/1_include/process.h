@@ -2,15 +2,7 @@
 #define PROCESS_H
 
 #include <stdint.h>
-
-#define MAX_NAME_LENGTH 64
-
-typedef enum {
-    READY,
-    RUNNING,
-    BLOCKED,
-    TERMINATED
-} process_status_t;
+#include "processInc.h"
 
 typedef int (*entry_point_t)(int argc, char **argv);
 

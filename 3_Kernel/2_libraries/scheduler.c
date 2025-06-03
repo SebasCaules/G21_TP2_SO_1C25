@@ -4,11 +4,7 @@
 #include <stddef.h>
 #include <time.h>
 
-#define NO_PID -1
-#define STDOUT 1
-#define STDIN 0
-#define INIT_PID 0
-#define SHELL_PID 1
+
 
 typedef struct scheduler_t {
     process_t* processes[MAX_PROCESSES + 1];
@@ -44,14 +40,11 @@ schedulerADT initScheduler(void) {
     addProcess((entry_point_t) initMain, argv, "init", 1, fds);
     // sys_write(STDOUT, (uint16_t *)"Scheduler initialized.\n", 24);
     return scheduler;
-
 }
-
 
 schedulerADT getScheduler(void) {
     return scheduler;
 }
-
 
 void* schedule(void* prevRSP) {
     if (scheduler == NULL || scheduler->size == 0) {

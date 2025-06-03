@@ -20,7 +20,7 @@ $(MODULE): $(OBJECTS) $(OBJECTS_ASM) $(LOADEROBJECT)
 
 # Rule for compiling C files
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -I./1_include -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I./1_include -I../../6_NoMansLand -c $< -o $@
 
 # Rule for assembling ASM files
 %.o: %.asm
