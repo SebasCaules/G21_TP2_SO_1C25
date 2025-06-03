@@ -6,12 +6,14 @@
 #include "syscallsInt.h"
 #include "colors.h"
 #include "defs.h"
+#include "processInc.h"
+#include "memoryManagerInc.h"
+
 
 #ifndef TPE_ARQUI_STDLIB_H
 #define TPE_ARQUI_STDLIB_H
 #define VRGCLI
 
-#include "processInc.h"
 
 typedef enum {
 	INT_TYPE = 0,
@@ -149,6 +151,8 @@ int64_t satoi (char * str, int64_t * flag);
 void * my_malloc(uint64_t size);
 
 void my_free(void *ptr);
+
+int mem(int argc, char *argv[]);
 
 int64_t newProcess(EntryPoint main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors);
 

@@ -27,10 +27,6 @@ GLOBAL sys_block_process
 GLOBAL sys_unblock_process
 GLOBAL sys_yield
 GLOBAL sys_waitpid
-GLOBAL sys_sem_open
-GLOBAL sys_sem_close
-GLOBAL sys_sem_wait
-GLOBAL sys_sem_post
 
 ; Synchronization syscalls
 GLOBAL sys_sem_open

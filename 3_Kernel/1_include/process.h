@@ -7,7 +7,7 @@
 typedef int (*entry_point_t)(int argc, char **argv);
 
 typedef struct process {
-    uint16_t pid;
+    int16_t pid;
     int16_t parent_pid;
 
     process_status_t status;

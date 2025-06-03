@@ -1,5 +1,9 @@
 #include <stdLib.h>
 
+
+static void print_padded_int(int value, int width);
+static void print_padded_str(const char *str, int width);
+
 // MSJ_1 : Debido a un error con el stdarg.h y los flags -mno-sse y -mno-sse2 no se pueden implementar los doubles o floats
 
 static uint64_t typeToBuffer(char* buffer, uint64_t length, va_list args, Types type){
@@ -10,7 +14,15 @@ static uint64_t typeToBuffer(char* buffer, uint64_t length, va_list args, Types 
 
 	switch (type) {
 	case INT_TYPE:
-		auxLength = convert_to_base_string(va_arg(args, int), 10, auxBuffer);
+		{
+			int val = va_arg(args, int);
+			if (val < 0) {
+				auxBuffer[0] = '-';
+				auxLength = convert_to_base_string(-val, 10, auxBuffer + 1) + 1;
+			} else {
+				auxLength = convert_to_base_string(val, 10, auxBuffer);
+			}
+		}
 		break;
     case HEX_TYPE:
         auxLength = convert_to_base_string(va_arg(args, uint64_t), 16, auxBuffer);
@@ -379,6 +391,43 @@ void my_free(void *ptr) {
     return sys_my_free(ptr);
 }
 
+int mem(int argc, char *argv[]) {
+    if (argc != 0) {
+        printf("mem: Invalid amount of arguments.\n");
+        return -1;
+    }
+
+    mem_info_t *info = sys_mem_dump();
+
+    char *units[] = {"B", "KB", "MB", "GB"};
+    char converted[32];
+
+    uint32_t values[] = {info->total_mem, info->used_mem, info->free_mem};
+    const char *labels[] = {"Total", "Used", "Free"};
+
+    for (int i = 0; i < 3; i++) {
+        uint32_t val = values[i];
+        int unitIndex = 0;
+        double convertedVal = val;
+
+        while (convertedVal >= 1024 && unitIndex < 3) {
+            convertedVal /= 1024.0;
+            unitIndex++;
+        }
+
+        int rounded = (int)(convertedVal + 0.5);
+        if(labels[i] == "Total") {
+            printf("%s: ", labels[i]);
+        } else {
+            printf("%s:  ", labels[i]);
+        }
+        print_padded_int(val, 10);
+        fdprintf(BLUE,"(%d %s)\n", rounded, units[unitIndex]);
+    }
+
+    return 0;
+}
+
 // Scheduler related functions
 
 int64_t newProcess(EntryPoint main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
@@ -417,22 +466,73 @@ int64_t yield(void) {
     return sys_yield();
 }
 
+// Print int left-aligned, pad with spaces after
+static void print_padded_int(int value, int width) {
+    char buf[16];
+    int len = 0, tmp = (value < 0) ? -value : value;
+    if (value == 0) len = 1;
+    else {
+        while (tmp) { len++; tmp /= 10; }
+    }
+    if (value < 0) len++; // account for '-' sign
+
+    printf("%d", value);
+    for (int i = 0; i < width - len; i++) putchar(' ');
+}
+
+// Print string left-aligned, pad with spaces after
+static void print_padded_str(const char *str, int width) {
+    int len = 0;
+    const char *s = str;
+    while (*s++) len++;
+    printf("%s", str);
+    for (int i = 0; i < width - len; i++) putchar(' ');
+}
+
+// #define PS_HEADER "PID  PPID Prio  Stat      Name\n"
+#define PS_HEADER "PID  PPID Prio Stat    Name\n"
 
 int ps(int argc, char *argv[]) {
-	if (argc != 0) {
-		printf("ps: Invalid amount of arguments.\n");
-		return -1;
-	}
-    
-	process_info_t *process_list = sys_ps();
-	char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
-	process_info_t *current = process_list;
+    if (argc != 0) {
+        printf("ps: Invalid amount of arguments.\n");
+        return -1;
+    }
 
-	while (current->pid != NO_PID) {
-		printf("%s: %d\n", current->name, current->pid);
-		current++;
-	}
-	return 0;
+    process_info_t *process_list = sys_ps();
+    char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
+    process_info_t *current = process_list;
+
+    // Encabezado alineado y ancho estándar
+    print_padded_str("PID", 4);
+    print_padded_str("PPID", 5);
+    print_padded_str("Prio", 5);
+    print_padded_str("Stat", 9);
+    print_padded_str("Name", 8);
+    print_padded_str("StackB", 9);
+    print_padded_str("StackP", 10);
+    print_padded_str("FG", 4);
+    putchar('\n');
+
+    char sbuf[16], sptrbuf[16];
+    while (current->pid != NO_PID) {
+        print_padded_int(current->pid, 4);
+        if(current->ppid < 0) {
+            print_padded_str("-", 5);
+        } else {
+            print_padded_int(current->ppid, 5);
+        }
+        print_padded_int(current->priority, 5);
+        print_padded_str(status_string[current->status], 9);
+        print_padded_str(current->name, 8);
+        convert_to_base_string((uint64_t)current->stackBase, 16, sbuf);
+        print_padded_str(sbuf, 9);
+        convert_to_base_string((uint64_t)current->stackPointer, 16, sptrbuf);
+        print_padded_str(sptrbuf, 10);
+        print_padded_str(current->foreground ? "yes" : "no", 4);
+        putchar('\n');
+        current++;
+    }
+    return 0;
 }
 
 

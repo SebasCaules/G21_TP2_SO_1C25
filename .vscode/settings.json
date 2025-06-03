@@ -21,6 +21,9 @@
         "scheduler.h": "c",
         "testprocess.h": "c",
         "process.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "testsynchro.h": "c",
+        "memorymanager.h": "c",
+        "strlib.h": "c"
     }
 }

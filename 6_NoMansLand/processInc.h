@@ -1,3 +1,6 @@
+#ifndef PROCESS_INC_H
+#define PROCESS_INC_H
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -18,7 +21,7 @@ typedef enum {
 
 typedef struct {
     char name[MAX_NAME_LENGTH];
-    uint16_t pid;
+    int16_t pid;
     int16_t ppid;
     uint8_t priority;
     void *stackBase;
@@ -28,3 +31,4 @@ typedef struct {
     uint64_t cpuTicks; // para calcular el %CPU (eventualmente)
 } process_info_t;
 
+#endif // PROCESS_INC_H

@@ -46,6 +46,7 @@ static module modules[] = {
     {"colorshow", 1, &colorShowcase},
     {"ps", 0, (EntryPoint) &ps},
     {"printA", 0, (EntryPoint) &printA},
+    {"mem", 0, (EntryPoint) &mem}
 };
 
 #define NUM_MODULES (sizeof(modules) / sizeof(modules[0]))
@@ -69,6 +70,8 @@ int help() {
     puts("  tsem            - Test the semaphore manager.");
     puts("  colorshow       - Show the color showcase.");
     puts("  ps              - Show the process status.");
+    puts("  printA          - Prints A forever.");
+    puts("  mem             - Show memory information.");
     return OK;
 }
 

@@ -34,7 +34,7 @@ static const uint32_t fileDescriptorStyle[FDS_COUNT] = {
     0x00FFFFFF, // FDS_STDOUT - blanco
     0x00FF0000, // FDS_STDERR - rojo
     0x0000FF00, // FDS_STDMARK - verde
-    0x000000FF, // FDS_BLUE
+    0x003366FF, // FDS_BLUE - azul celeste más visible
     0x00FFFF00, // FDS_YELLOW
     0x0000FFFF, // FDS_CYAN
     0x00FF00FF, // FDS_MAGENTA

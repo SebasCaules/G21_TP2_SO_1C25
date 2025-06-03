@@ -1,3 +1,6 @@
+#ifndef __TIME_STRUCT_H__
+#define __TIME_STRUCT_H__
+
 #include <stdint.h>
 
 typedef struct time {
@@ -9,3 +12,5 @@ typedef struct time {
     uint8_t seconds;
 
 } time_struct;
+
+#endif // __TIME_STRUCT_H__
