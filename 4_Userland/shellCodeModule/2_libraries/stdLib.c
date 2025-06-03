@@ -423,15 +423,15 @@ int ps(int argc, char *argv[]) {
 		printf("ps: Invalid amount of arguments.\n");
 		return -1;
 	}
-
+    
 	process_info_t *process_list = sys_ps();
 	char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
 	process_info_t *current = process_list;
 
-	// while (current->pid != NO_PID) {
-	// 	//printf("%s: %d\n", current->name, current->pid);
-	// 	current++;
-	// }
+	while (current->pid != NO_PID) {
+		printf("%s: %d\n", current->name, current->pid);
+		current++;
+	}
 	return 0;
 }
 

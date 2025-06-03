@@ -25,7 +25,7 @@ typedef enum {
 
 typedef struct {
     char name[MAX_NAME_LENGTH];
-    uint16_t pid;
+    int16_t pid;
     int16_t ppid;
     uint8_t priority;
     void *stackBase;

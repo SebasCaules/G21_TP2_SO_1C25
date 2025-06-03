@@ -223,44 +223,44 @@ int setPriority(uint16_t pid, uint8_t newPriority) {
 
 process_info_t* processStatus(void) {
     static process_info_t processInfo[MAX_PROCESSES];
-    int index = 0;
+    // int index = 0;
 
-    for (int i = 0; i < MAX_PROCESSES; i++) {
-        process_t* proc = scheduler->processes[i];
-        if (proc != NULL) {
-            process_info_t* info = &processInfo[index++];
-            strncopy(info->name, proc->name, MAX_NAME_LENGTH);
-            info->pid = proc->pid;
-            info->ppid = proc->parent_pid;
-            info->priority = proc->priority;
-            info->stackBase = proc->stack_base;
-            info->stackPointer = proc->stack_pointer;
-            info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
-            info->status = proc->status;
-            info->cpuTicks = 0;  // para trackear el uso de CPU (eventualmente)
-            sys_write(STDOUT, "proceso", 7);;
-        }
-    }
-    char ary[] = {0,0};
+    // for (int i = 0; i < MAX_PROCESSES; i++) {
+    //     process_t* proc = scheduler->processes[i];
+    //     if (proc != NULL) {
+    //         process_info_t* info = &processInfo[index++];
+    //         strncopy(info->name, proc->name, MAX_NAME_LENGTH);
+    //         info->pid = proc->pid;
+    //         info->ppid = proc->parent_pid;
+    //         info->priority = proc->priority;
+    //         info->stackBase = proc->stack_base;
+    //         info->stackPointer = proc->stack_pointer;
+    //         info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
+    //         info->status = proc->status;
+    //         info->cpuTicks = 0;  // para trackear el uso de CPU (eventualmente)
+    //         sys_write(STDOUT, "proceso\n", 8);
+    //     }
+    // }
 
-    return processInfo;
-    // int count = 0;
-	// for (int i = 0; i < MAX_PROCESSES; i++) {
-	// 	if (scheduler->processes[i] != NULL) {
-	// 		process_info_t info;
-	// 		info.pid = scheduler->processes[i]->pid;
-	// 		strncopy(info.name, scheduler->processes[i]->name, MAX_NAME_LENGTH);
-	// 		info.priority = scheduler->processes[i]->priority;
-	// 		info.stackBase = scheduler->processes[i]->stack_base;
-	// 		info.ppid = scheduler->processes[i]->parent_pid;
-	// 		info.status = scheduler->processes[i]->status;
-	// 		psInfo[count++] = info;
-	// 	}
-	// }
-	// process_info_t empty;
-	// empty.pid = -1;
-	// psInfo[count] = empty;
-	// return psInfo;
+    // return processInfo;
+
+    int count = 0;
+	for (int i = 0; i < MAX_PROCESSES; i++) {
+		if (scheduler->processes[i] != NULL) {
+			process_info_t info;
+			info.pid = scheduler->processes[i]->pid;
+			strncopy(info.name, scheduler->processes[i]->name, MAX_NAME_LENGTH);
+			info.priority = scheduler->processes[i]->priority;
+			info.stackBase = scheduler->processes[i]->stack_base;
+			info.ppid = scheduler->processes[i]->parent_pid;
+			info.status = scheduler->processes[i]->status;
+			processInfo[count++] = info;
+		}
+	}
+	process_info_t empty;
+	empty.pid = -1;
+	processInfo[count] = empty;
+	return processInfo;
 }
 
 
