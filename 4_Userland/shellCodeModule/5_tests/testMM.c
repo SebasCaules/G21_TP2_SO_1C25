@@ -18,7 +18,8 @@ void * shared_libc_memset (void * destination, int32_t c, uint64_t length) {
 	return destination;
 }
 
-int64_t testMM (char * argv[],  uint64_t argc) {
+int64_t testMM(uint64_t argc, char * argv[]) {
+// int64_t testMM (char * argv[],  uint64_t argc) {
 
 	mm_rq mm_rqs[MAX_BLOCKS];
 	uint64_t rq;

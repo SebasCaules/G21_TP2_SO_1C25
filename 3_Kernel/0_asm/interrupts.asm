@@ -27,90 +27,75 @@ EXTERN getStackBase
 
 section .text
 
-%macro pushState 0
-	push rax
-	push rbx
-	push rcx
-	push rdx
-	push rbp
-	push rdi
-	push rsi
-	push r8
-	push r9
-	push r10
-	push r11
-	push r12
-	push r13
-	push r14
-	push r15
-%endmacro
-
-%macro pushStateNew 1
+%macro pushState 1
     %if %1
         push rax
     %endif
-	push rbx
-	push rcx
-	push rdx
-	push rbp
-	push rdi
-	push rsi
-	push r8
-	push r9
-	push r10
-	push r11
-	push r12
-	push r13
-	push r14
-	push r15
+    push rbx
+    push rcx
+    push rdx
+    push rbp
+    push rdi
+    push rsi
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
 %endmacro
 
-%macro popState 0
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop rsi
-	pop rdi
-	pop rbp
-	pop rdx
-	pop rcx
-	pop rbx
-	pop rax
+%macro popState 1
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rsi
+    pop rdi
+    pop rbp
+    pop rdx
+    pop rcx
+    pop rbx
+    %if %1
+        pop rax
+    %endif
 %endmacro
 
-%macro popStateNoRAX 0
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop rsi
-	pop rdi
-	pop rbp
-	pop rdx
-	pop rcx
-	pop rbx
-%endmacro
+; %macro irqHandlerMaster 1
+;     pushState 1
+
+;     mov rdi, %1 ; pasaje de parametro
+;     mov rsi, rsp
+;     call irqDispatcher
+;     mov rsp, rax
+
+;     ; signal pic EOI (End of Interrupt)
+;     mov al, 20h
+;     out 20h, al
+
+;     popState 1
+;     iretq
+; %endmacro
 
 %macro irqHandlerMaster 1
-	pushState
+	pushState 1
 
 	mov rdi, %1 ; pasaje de parametro
+	mov rsi, rsp
 	call irqDispatcher
+	mov rsp, rax
 
 	; signal pic EOI (End of Interrupt)
 	mov al, 20h
 	out 20h, al
 
-	popState
+	popState 1
 	iretq
 %endmacro
 
@@ -137,7 +122,7 @@ section .text
     mov rax, [rsp + (8 * 0)] ;rip
     mov [regs + (8 * 16)], rax
 
-	; estos no se 
+    ; estos no se 
     mov rax, [rsp + (8 * 2)] ;rflags
     mov [regs + (8 * 17)], rax
 
@@ -154,127 +139,125 @@ section .text
 
     snapshot
 
-	mov rdi, %1 ; pasaje de parametro
-	call exceptionDispatcher
+    mov rdi, %1 ; pasaje de parametro
+    call exceptionDispatcher
 
-	call getStackBase
+    call getStackBase
 
-	mov [rsp+24], rax
+    mov [rsp+24], rax
 
-	mov rax, userland
-	mov [rsp], rax
+    mov rax, userland
+    mov [rsp], rax
 
-	iretq
+    iretq
 %endmacro
 
 getSnap:
-	mov rax, regs
-	ret
+    mov rax, regs
+    ret
 
 _hlt:
-	sti
-	hlt
-	ret
+    sti
+    hlt
+    ret
 
 _cli:
-	cli
-	ret
+    cli
+    ret
 
 
 _sti:
-	sti
-	ret
+    sti
+    ret
 
 picMasterMask:
-	push rbp
+    push rbp
     mov rbp, rsp
     mov ax, di
-    out	21h,al
+    out 21h,al
     pop rbp
     retn
 
 picSlaveMask:
-	push    rbp
+    push    rbp
     mov     rbp, rsp
     mov     ax, di  ; ax = mascara de 16 bits
-    out	0A1h,al
+    out 0A1h,al
     pop     rbp
     retn
 
 timer_tick:
-	int 20h
-	ret
+    int 20h
+    ret
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:
-	irqHandlerMaster 0
+    irqHandlerMaster 0
 
 ;Keyboard
 _irq01Handler:
-	irqHandlerMaster 1
+    irqHandlerMaster 1
 
 ;Cascade pic never called
 _irq02Handler:
-	irqHandlerMaster 2
+    irqHandlerMaster 2
 
 ;Serial Port 2 and 4
 _irq03Handler:
-	irqHandlerMaster 3
+    irqHandlerMaster 3
 
 ;Serial Port 1 and 3
 _irq04Handler:
-	irqHandlerMaster 4
+    irqHandlerMaster 4
 
 ;USB
 _irq05Handler:
-	irqHandlerMaster 5
+    irqHandlerMaster 5
 
 ;Sys Calls
 _irq80Handler:
-	pushState
+	pushState 1
 	mov rdi, rsp
 	call sysCallHandler
-	popStateNoRAX
+	popState 0
 	add rsp, 8
 	iretq
 
-
 setup_stack_frame:
-	mov r8, rsp
-	mov r9, rbp
-	mov rsp, rdx
-	mov rbp, rdx
-	push 0x0
-	push rdx
-	push 0x202
-	push 0x8
-	push rdi
-	mov rdi, rsi
-	mov rsi, rcx
-	pushStateNew 1
-	mov rax, rsp
-	mov rsp, r8
-	mov rbp, r9
-	ret
-
+    mov r8, rsp
+    mov r9, rbp
+    mov rsp, rdx
+    mov rbp, rdx
+    push 0x0
+    push rdx
+    push 0x202
+    push 0x8
+    push rdi
+    mov rdi, rsi
+    mov rsi, rcx
+    pushState 1
+    mov rax, rsp
+    mov rsp, r8
+    mov rbp, r9
+    ret
 
 ;Zero Division Exception
 _exception0Handler:
-	exceptionHandler 0
+    exceptionHandler 0
 
 ;Opcode Exception
 _exception6Handler:
-	exceptionHandler 6
+    exceptionHandler 6
 
 haltcpu:
-	cli
-	hlt
-	ret
+    cli
+    hlt
+    ret
 
 
 section .rodata
     userland equ 0x400000
 
 section .bss
-	aux resq 1
-	regs resq 20
+    aux resq 1
+    regs resq 20

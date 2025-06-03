@@ -4,7 +4,7 @@ int main() {
     initShell();
     
     int returned = OK;
-
+    
     while(returned != EXIT) {
         prompt();
         char command[MAX_COMMAND_LENGTH + 1];

@@ -58,8 +58,10 @@ int main() {
 	initSemManager();
 	initKeyboardDriver();
 	initPipes();
+	// sys_write(1, (uint16_t *)"Before IDT\n", 20);
 	load_idt();
+	// sys_write(1, (uint16_t *)"loading next\n", 20);
 	((EntryPoint)sampleCodeModuleAddress)();
-
+	
 	return 0;
 }

@@ -49,6 +49,7 @@ typedef struct process {
 process_t *createProcess(
     uint16_t pid,
     int16_t parent_pid,
+    uint16_t waiting_for_pid,
     entry_point_t entry_point,
     char **argv,
     const char *name,

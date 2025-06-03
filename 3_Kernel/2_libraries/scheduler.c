@@ -42,7 +42,7 @@ schedulerADT initScheduler(void) {
     char *argv[] = { NULL };
     int fds[2] = { STDIN, STDOUT };
     addProcess((entry_point_t) initMain, argv, "init", 1, fds);
-
+    // sys_write(STDOUT, (uint16_t *)"Scheduler initialized.\n", 24);
     return scheduler;
 
 }
@@ -58,20 +58,28 @@ void* schedule(void* prevRSP) {
         return prevRSP;
     }
 
-    if (scheduler->current != NO_PID && scheduler->processes[scheduler->current] != NULL) {
-        process_t* currentProcess = scheduler->processes[scheduler->current];
-        if (currentProcess->status == RUNNING) {
-            currentProcess->stack_pointer = prevRSP;
-            currentProcess->status = READY;
-        }
-    }
+    // if (scheduler->current != NO_PID && scheduler->processes[scheduler->current] != NULL) {
+    //     process_t* currentProcess = scheduler->processes[scheduler->current];
+    //     if (currentProcess->status == RUNNING) {
+    //         currentProcess->stack_pointer = prevRSP;
+    //         currentProcess->status = READY;
+    //     }
+    // }
+
+    if (scheduler->current != NO_PID) {
+		process_t *currentProcess = scheduler->processes[scheduler->current];
+		currentProcess->stack_pointer = prevRSP;
+		if (currentProcess->status == RUNNING) {
+			currentProcess->status = READY;
+		}
+	}
 
     process_t *next = getNextProcess();
     if (next == NULL) {
         return prevRSP;
     }
     scheduler->current = next->pid;
-    uint64_t nextRSP = next->stack_pointer;
+    uint64_t nextRSP = (uint64_t) next->stack_pointer;
     next->status = RUNNING;
 
     return (void *) nextRSP;
@@ -95,12 +103,13 @@ int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillab
     if (pid == NO_PID) {
         return -1;
     }
-
+    
     uint16_t parentPid = (scheduler->current != NO_PID) ? scheduler->current : NO_PID;
-
+    
     process_t *newProcess = createProcess(
         pid,
         parentPid,
+        NO_PID,
         main,
         argv,
         name,
@@ -253,7 +262,7 @@ void myExit(int64_t retValue) {
         unblockProcess(parent->pid);
     }
 
-    removeProcess(currentProcess->pid); // Eliminar el proceso correctamente
+    // removeProcess(currentProcess->pid); // Eliminar el proceso correctamente
     yield();
 }
 
@@ -344,17 +353,19 @@ static int initMain(int argc, char **argv) {
 
     int shellPid = addProcess((entry_point_t) SHELL_ADDRESS, shellArgs, "shell", 1, fds);
     setPriority(shellPid, MAX_PRIORITY);
-
+    // sys_write(STDOUT, (uint16_t *)"shell process started.\n", 22);
+    
     while (1) {
-        for (int i = 0; i < MAX_PROCESSES; i++) {
-            if (scheduler->processes[i] != NULL && 
-                scheduler->processes[i]->status == TERMINATED && 
-                scheduler->processes[i]->parent_pid == INIT_PID) {
-                removeProcess(i);
-            }
-        }
-        _hlt();
-    }
+		for (int i = 0; i < MAX_PROCESSES; i++) {
+			if (scheduler->processes[i] != NULL) {
+				if (scheduler->processes[i]->status == TERMINATED &&
+					scheduler->processes[i]->parent_pid == 0) {
+					removeProcess(i);
+				}
+			}
+		}
+		_hlt();
+	}
     return 0;
 }
 
@@ -366,11 +377,11 @@ static process_t* getNextProcess(void) {
     // Ver si el proceso actual puede seguir ejecutándose
     process_t *currentProcess = scheduler->processes[scheduler->current];
     if (currentProcess != NULL &&
-        (currentProcess->status == READY || currentProcess->status == RUNNING) &&
-        currentProcess->remaining_quantum > 0) {
-        currentProcess->remaining_quantum--;
-        return currentProcess;
-    }
+		(currentProcess->status == READY || currentProcess->status == RUNNING) &&
+		currentProcess->remaining_quantum > 0) {
+		currentProcess->remaining_quantum--;
+		return currentProcess;
+	}
 
     // Buscar el próximo proceso listo (Round Robin)
     uint16_t start = (scheduler->current == NO_PID) ? 0 : (scheduler->current + 1) % MAX_PROCESSES;
@@ -385,6 +396,18 @@ static process_t* getNextProcess(void) {
         }
         current = (current + 1) % MAX_PROCESSES;
     } while (current != start);
+
+    // do {
+	// 	if (scheduler->processes[current] != NULL &&
+	// 		scheduler->processes[current]->status == READY) {
+	// 		scheduler->current = current;
+	// 		scheduler->processes[current]->remaining_quantum =
+	// 			scheduler->processes[current]->priority - 1;
+	// 		return scheduler->processes[current];
+	// 	}
+	// 	current = (current + 1) % MAX_PROCESSES;
+	// } while (current != start);
+    
     return NULL;
 }
 
