@@ -58,14 +58,6 @@ void* schedule(void* prevRSP) {
         return prevRSP;
     }
 
-    // if (scheduler->current != NO_PID && scheduler->processes[scheduler->current] != NULL) {
-    //     process_t* currentProcess = scheduler->processes[scheduler->current];
-    //     if (currentProcess->status == RUNNING) {
-    //         currentProcess->stack_pointer = prevRSP;
-    //         currentProcess->status = READY;
-    //     }
-    // }
-
     if (scheduler->current != NO_PID) {
 		process_t *currentProcess = scheduler->processes[scheduler->current];
 		currentProcess->stack_pointer = prevRSP;
@@ -85,7 +77,6 @@ void* schedule(void* prevRSP) {
     return (void *) nextRSP;
 
 }
-
 
 int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {
     if (scheduler == NULL || scheduler->size >= MAX_PROCESSES || fileDescriptors == NULL) {
@@ -223,44 +214,29 @@ int setPriority(uint16_t pid, uint8_t newPriority) {
 
 process_info_t* processStatus(void) {
     static process_info_t processInfo[MAX_PROCESSES];
-    // int index = 0;
+    int index = 0;
 
-    // for (int i = 0; i < MAX_PROCESSES; i++) {
-    //     process_t* proc = scheduler->processes[i];
-    //     if (proc != NULL) {
-    //         process_info_t* info = &processInfo[index++];
-    //         strncopy(info->name, proc->name, MAX_NAME_LENGTH);
-    //         info->pid = proc->pid;
-    //         info->ppid = proc->parent_pid;
-    //         info->priority = proc->priority;
-    //         info->stackBase = proc->stack_base;
-    //         info->stackPointer = proc->stack_pointer;
-    //         info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
-    //         info->status = proc->status;
-    //         info->cpuTicks = 0;  // para trackear el uso de CPU (eventualmente)
-    //         sys_write(STDOUT, "proceso\n", 8);
-    //     }
-    // }
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        process_t* proc = scheduler->processes[i];
+        if (proc != NULL) {
+            process_info_t* info = &processInfo[index++];
+            strncopy(info->name, proc->name, MAX_NAME_LENGTH);
+            info->pid = proc->pid;
+            info->ppid = proc->parent_pid;
+            info->priority = proc->priority;
+            info->stackBase = proc->stack_base;
+            info->stackPointer = proc->stack_pointer;
+            info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
+            info->status = proc->status;
+            info->cpuTicks = 0;  // para trackear el uso de CPU (eventualmente)
+        }
+    }
 
-    // return processInfo;
+    process_info_t empty;
+    empty.pid = -1;
+    processInfo[index] = empty;
 
-    int count = 0;
-	for (int i = 0; i < MAX_PROCESSES; i++) {
-		if (scheduler->processes[i] != NULL) {
-			process_info_t info;
-			info.pid = scheduler->processes[i]->pid;
-			strncopy(info.name, scheduler->processes[i]->name, MAX_NAME_LENGTH);
-			info.priority = scheduler->processes[i]->priority;
-			info.stackBase = scheduler->processes[i]->stack_base;
-			info.ppid = scheduler->processes[i]->parent_pid;
-			info.status = scheduler->processes[i]->status;
-			processInfo[count++] = info;
-		}
-	}
-	process_info_t empty;
-	empty.pid = -1;
-	processInfo[count] = empty;
-	return processInfo;
+    return processInfo;
 }
 
 

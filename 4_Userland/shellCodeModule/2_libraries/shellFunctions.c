@@ -283,22 +283,11 @@ int getCmdInput(char* command) {
             if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
                 found = 1;
                 if (modules[j].builtin) {
-                    printf("Executing builtin command: %s\n", executable_commands[i].command);
-                    printf("Arguments: ");
-                    for (int k = 0; k < executable_commands[i].argc; k++) {
-                        printf("%s ", executable_commands[i].args[k]);
-                    }
-                    putchar('\n');
                     return modules[j].function(executable_commands[i].argc, executable_commands[i].args);
                 } else {
-                    for (int a = 0; a < executable_commands[i].argc; a++) {
-                        printf("arg[%d]: %s\n", a, executable_commands[i].args[a]);
-                    }
                     executable_commands[i].pid = newProcess(
                         modules[j].function, executable_commands[i].args,
                         executable_commands[i].command, 0, executable_commands[i].fds);
-                    printf("Executing external command: %s\n", executable_commands[i].command);
-                    printf("pid: %d\n", executable_commands[i].pid);
                     if (executable_commands[i].pid == -1) {
                         fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
                         return ERROR;
