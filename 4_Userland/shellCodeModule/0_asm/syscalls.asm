@@ -44,6 +44,8 @@ GLOBAL sys_destroy_pipe
 GLOBAl sys_read_pipe
 GLOBAL sys_write_pipe
 
+GLOBAl sys_ps
+
 section .text
 
 %macro pushState 0
@@ -226,4 +228,7 @@ sys_read_pipe:
 
 sys_write_pipe:
     sys_handler 32
+
+sys_ps:
+    sys_handler 33
 

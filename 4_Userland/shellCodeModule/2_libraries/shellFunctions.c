@@ -63,8 +63,7 @@ static module modules[] = {
     {"ts", 0, (EntryPoint) &testProcess},
     {"tp", 0, (EntryPoint) &testPriority},
     {"tsem", 0, (EntryPoint)&test_sync},
-    {"colorshow", 1, &colorShowcase},
-    {"a", 0, (EntryPoint) &printA}
+    {"colorshow", 1, &colorShowcase}
 };
 
 
@@ -86,6 +85,7 @@ int help() {
     puts("  tp              - Test the priority manager.");
     puts("  tsem            - Test the semaphore manager.");
     puts("  colorshow       - Show the color showcase.");
+    puts("  ps              - Show the process status.");
     return OK;
 }
 
@@ -297,13 +297,10 @@ int getCmdInput(char* command) {
                         executable_commands[i].command, 0, executable_commands[i].fds);
                     printf("Executing external command: %s\n", executable_commands[i].command);
                     printf("pid: %d\n", executable_commands[i].pid);
-                    yield();
-                    
                     if (executable_commands[i].pid == -1) {
                         fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
                         return ERROR;
                     }
-                    printf("pid: %d\n", executable_commands[i].pid);
                     
                 }
                 break;

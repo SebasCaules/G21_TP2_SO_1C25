@@ -59,6 +59,7 @@ syscall_fn syscall_table[] = {
     (syscall_fn)sys_destroy_pipe,      // 30
     (syscall_fn)sys_read_pipe,         // 31
     (syscall_fn)sys_write_pipe,        // 32
+    (syscall_fn)sys_ps,                // 33
 };
 
 uint64_t sysCallHandler(Registers * regs) {
@@ -228,6 +229,10 @@ int64_t sys_yield() {
 
 int64_t sys_waitpid(uint32_t pid) {
     return waitPid(pid);
+}
+
+int64_t sys_ps() {
+    return (int64_t)processStatus();
 }
 
 // Synchronization related syscalls
