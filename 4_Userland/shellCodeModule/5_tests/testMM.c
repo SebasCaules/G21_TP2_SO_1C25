@@ -26,13 +26,13 @@ int64_t testMM(uint64_t argc, char * argv[]) {
 	uint64_t total;
 	uint64_t max_memory;
 
-	if ( argc != 2 ) {
+	if ( argc != 1 ) {
 		fdprintf (STDERR, "Usage: testmm <max_memory>\n");
 		return -1;
 	}
 
 	int64_t satoi_flag;
-	if ((max_memory = satoi ( argv[1], &satoi_flag)) <= 0 ) {
+	if ((max_memory = satoi ( argv[0], &satoi_flag)) <= 0 ) {
 		fdprintf (STDERR, "Error: <max_memory> must be a positive integer.\n");
 		return -1;
 	}
