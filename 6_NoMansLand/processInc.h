@@ -12,10 +12,13 @@
 #define INIT_PID 0
 #define SHELL_PID 1
 
+#define MAX_PRIORITY 4
+#define MIN_PRIORITY 1
+
 typedef enum {
     READY,
-    RUNNING,
     BLOCKED,
+    RUNNING,
     TERMINATED
 } process_status_t;
 

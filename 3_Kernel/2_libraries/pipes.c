@@ -41,8 +41,8 @@ int createPipe(int fds[2]) {
 			fds[1] = pipes[i]->fds[1];
 			itoa(pipes[i]->fds[0], pipes[i]->writeSem);
 			itoa(pipes[i]->fds[1], pipes[i]->readSem);
-			strncat(pipes[i]->writeSem, "_w");
-			strncat(pipes[i]->readSem, "_r");
+			strncat(pipes[i]->writeSem, "write");
+			strncat(pipes[i]->readSem, "read");
 
 			if (semOpen(pipes[i]->writeSem, PIPE_SIZE) == -1) {
 				pipes[i] = NULL;

@@ -17,14 +17,16 @@
 
 typedef enum {
 	INT_TYPE = 0,
-    HEX_TYPE,
-    BIN_TYPE,
-    OCT_TYPE,
+	HEX_TYPE,
+	BIN_TYPE,
+	OCT_TYPE,
 	FLOAT_TYPE,
 	DOUBLE_TYPE,
 	CHAR_TYPE,
 	STR_TYPE,
 } Types;
+
+extern char *status_string[];
 
 
 /**
@@ -147,6 +149,8 @@ char* convert(int argc, char *argv[]);
 
 // Cambiar por strToInt
 int64_t satoi (char * str, int64_t * flag);
+
+int64_t atoi(char * str);
 
 void * my_malloc(uint64_t size);
 

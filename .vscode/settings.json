@@ -24,6 +24,8 @@
         "stddef.h": "c",
         "testsynchro.h": "c",
         "memorymanager.h": "c",
-        "strlib.h": "c"
+        "strlib.h": "c",
+        "colors.h": "c",
+        "processinc.h": "c"
     }
 }

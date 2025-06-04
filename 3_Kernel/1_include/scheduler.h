@@ -5,10 +5,6 @@
 #include "process.h"
 #include "colors.h"
 
-
-#define MAX_PRIORITY 4
-#define MIN_PRIORITY 1
-
 typedef struct scheduler_t * schedulerADT;
 
 schedulerADT initScheduler(void);

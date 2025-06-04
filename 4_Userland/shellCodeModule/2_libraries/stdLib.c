@@ -172,9 +172,9 @@ int scanf(const char *format, ...) {
 }
 
 int getchar() {
-    uint16_t c;
-    while (sys_read(STDIN, &c, 1) == 0 || c > 255);
-    return (char) c;
+    int c;
+    while (sys_read(STDIN, &c, 1) == 0 || c > 255)
+    return(char) c;
 }
 
 int readInput(char * c) {
@@ -182,7 +182,7 @@ int readInput(char * c) {
 }
 
 int putchar(char c) {
-    return sys_write(STDOUT, (uint16_t *)&c, 1);
+    return sys_write(STDOUT, &c, 1);
 }
 
 int putsNoNewLine(const char *fmt) {
@@ -381,6 +381,10 @@ int64_t satoi (char * str, int64_t * flag) {
 	return res * sign;
 }
 
+int64_t atoi(char * str) {
+    return satoi(str, NULL);
+}
+
 // Memory Manager related functions
 
 void * my_malloc(uint64_t size) {
@@ -491,6 +495,7 @@ static void print_padded_str(const char *str, int width) {
 
 // #define PS_HEADER "PID  PPID Prio  Stat      Name\n"
 #define PS_HEADER "PID  PPID Prio Stat    Name\n"
+char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
 
 int ps(int argc, char *argv[]) {
     if (argc != 0) {
@@ -499,7 +504,6 @@ int ps(int argc, char *argv[]) {
     }
 
     process_info_t *process_list = sys_ps();
-    char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
     process_info_t *current = process_list;
 
     // Encabezado alineado y ancho estándar

@@ -1,6 +1,8 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 
+#include <stdint.h>
+
 extern int getPressedKey();
 
 /**
@@ -21,5 +23,7 @@ unsigned char bufferNext();
  * @return 1 or 0
  */
 uint64_t getRegisters(uint64_t * r);
+
+char kb_getchar();
 
 #endif

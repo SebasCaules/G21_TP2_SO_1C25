@@ -8,6 +8,7 @@
 #include "memoryManager.h"
 #include "colors.h"
 #include "timeStruct.h"
+#include "pipes.h"
 
 typedef struct {
     uint64_t rax;

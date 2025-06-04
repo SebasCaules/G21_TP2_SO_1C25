@@ -15,7 +15,14 @@ int isValidBase(const char *base);
 int isNumberInBase(const char *num, const char *base);
 int isConvertValid(char words[MAX_WORDS][MAX_WORD_LENGTH]);
 int colorShowcase();
+int loop(int argc, char *argv[]);
+int killCommand(int argc, char *argv[]);
+static int nice_command(int argc, char *argv[]);
+static int blockUnblock(int argc, char *argv[]);
 
+static int cat(int argc, char *argv[]);
+static int wc(int argc, char *argv[]);
+static int filter(int argc, char *argv[]);
 
 static uint8_t foreground = 1;
 
@@ -46,7 +53,14 @@ static module modules[] = {
     {"colorshow", 1, &colorShowcase},
     {"ps", 0, (EntryPoint) &ps},
     {"printA", 0, (EntryPoint) &printA},
-    {"mem", 0, (EntryPoint) &mem}
+    {"mem", 0, (EntryPoint) &mem},
+    {"loop", 0, (EntryPoint) &loop},
+    {"kill", 1, &killCommand},
+    {"nice", 1, &nice_command},
+    {"block", 1, &blockUnblock},
+    {"cat", 0, (EntryPoint) &cat},
+    {"wc", 0, (EntryPoint) &wc},
+    {"filter", 0, (EntryPoint) &filter}
 };
 
 #define NUM_MODULES (sizeof(modules) / sizeof(modules[0]))
@@ -72,6 +86,10 @@ int help() {
     puts("  ps              - Show the process status.");
     puts("  printA          - Prints A forever.");
     puts("  mem             - Show memory information.");
+    puts("  loop <ms>       - Loop of ID and greeting every couple of 100*ms.");
+    puts("  kill <pid>      - Kills the process with the given pid.");
+    puts("  nice            - <pid> <priority> Changes the priority of the process with the given pid.");
+    puts("  block <pid>     - Switches from blocked to ready state or vice versa.");
     return OK;
 }
 
@@ -241,8 +259,9 @@ int getCmdInput(char* command) {
         if (executable_commands[i].argc == ERROR) {
             return ERROR;
         }
-        // if (pipe_pos)
-        // 	command = pipe_pos + 1;
+        if (pipe_pos) {
+            command = pipe_pos + 1;
+        }
     }
 
     if (pipe_pos) {
@@ -251,6 +270,7 @@ int getCmdInput(char* command) {
             fdprintf(STDERR, "Error creating pipe.\n");
 			return ERROR;
 		}
+        printf("Pipe created with fds: %d, %d\n", pipefds[0], pipefds[1]);
 		executable_commands[0].fds[1] = pipefds[1];
 		executable_commands[1].fds[0] = pipefds[0];
 		executable_commands[1].fds[1] = STDOUT;
@@ -298,6 +318,7 @@ int getCmdInput(char* command) {
 			}
 		}
 		if (pipe_pos) {
+            printf("Pipe destroying\n");
 			destroyPipe(executable_commands[0].fds[1]);
 		}
 	}
@@ -377,4 +398,199 @@ int colorShowcase() {
     puts("\n=== End of Color Parade ===");
     puts("Use these color codes to make your shell stylish and expressive.");
     return OK;
+}
+
+int loop(int argc, char *argv[]) {
+    if (argc != 1) {
+        fdprintf(STDERR, "Usage: loop <seconds>\n");
+        return ERROR;
+    }
+
+    int seconds = satoi(argv[0], NULL);
+    if (seconds <= 0) {
+        fdprintf(STDERR, "Invalid number of seconds.\n");
+        return ERROR;
+    }
+    while (1) {
+        printf("PID: %d, Please kill me, im trapped in here\n", getPid());
+        sleep(seconds * 100);
+    }
+    return OK;
+}
+
+int killCommand(int argc, char *argv[]) {
+    if (argc != 1) {
+        fdprintf(STDERR, "Invalid amount of arguments. kill <pid>\n");
+		return ERROR;
+	}
+    int64_t pid = atoi(argv[0]);
+	int ret = kill(pid);
+	if (ret == -1) {
+        fdprintf(STDERR, "Error killing process with PID %d.\n", pid);
+		return ERROR;
+	}
+    fdprintf(STDMARK, "Process with PID %d killed successfully.\n", pid);
+	return OK;
+}
+
+static int nice_command(int argc, char *argv[]) {
+	if (argc != 2) {
+        fdprintf(STDERR, "Invalid amount of arguments. Usage: nice <pid> <priority>\n");
+		return ERROR;
+	}
+	int pid = atoi(argv[0]);
+	int priority = atoi(argv[1]);
+	if (priority < MIN_PRIORITY || priority > MAX_PRIORITY) {
+        fdprintf(STDERR, "Invalid priority. Must be between %d and %d.\n", MIN_PRIORITY, MAX_PRIORITY);
+		return ERROR;
+	}
+	int ret = nice(pid, priority);
+	if (ret == -1) {
+        fdprintf(STDERR, "Error changing priority for PID %d to %d.\n", pid, priority);
+		return ERROR;
+	}
+	return OK;
+}
+
+static int blockUnblock(int argc, char *argv[]) {
+    if (argc != 1) {
+        fdprintf(STDERR, "Invalid amount of arguments. Usage: block <pid>\n");
+        return ERROR;
+    }
+    int pid = atoi(argv[0]);
+    process_info_t *process_list = sys_ps();
+    process_info_t *current = process_list;
+    while (current->pid != pid) {
+        current++;
+    }
+
+    if (current->status == READY) {
+        int ret = blockProcess(pid);
+        if (ret == -1) {
+            fdprintf(STDERR, "Error blocking process with PID %d.\n", pid);
+            return ERROR;
+        }
+        fdprintf(STDMARK, "Process with PID %d changed from READY to BLOCKED.\n", pid);
+    } else if (current->status == BLOCKED) {
+        int ret = unblockProcess(pid);
+        if (ret == -1) {
+            fdprintf(STDERR, "Error unblocking process with PID %d.\n", pid);
+            return ERROR;
+        }
+        fdprintf(STDMARK, "Process with PID %d changed from BLOCKED to READY.\n", pid);
+    }
+    
+    return OK;
+}
+
+// static int cat(int argc, char *argv[]) {
+//     char c;
+//     while((c = getchar()) != EOF) {
+//         if(c){
+//             putchar(c);
+//         }
+//     }
+//     fdprintf(ORANGE, "\nReached EOF.\n");
+//     return OK;
+// }
+
+static int cat(int argc, char **argv) {
+	if (argc != 0) {
+		printf("cat: Invalid amount of arguments.\n");
+		return -1;
+	}
+
+	int c;
+	while ((c = getchar()) != EOF) {
+		if (c)
+			putchar(c);
+	}
+
+	return 0;
+}
+
+static int wc(int argc, char *argv[]) {
+    char c;
+    int lines = 0, words = 0, chars = 0;
+    while((c = getchar()) != EOF) {
+        if(c){
+            putchar(c);
+            chars++;
+        }
+        if(c == '\n') {
+            lines++;
+        }
+        if(c == ' ') {
+            words++;
+        }
+    }
+    fdprintf(ORANGE, "\nReached EOF.\n");
+    fdprintf(BLUE, "Lines: %d, Words: %d, Characters: %d\n", lines, words + 1, chars);
+    return OK;
+}
+
+static bool isStandardVowel(char c) {
+    return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ||
+            c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == '\n');
+}
+
+static bool isFrenchVowel(char c) {
+    return isStandardVowel(c) || c == 'y' || c == 'Y';
+}
+
+static bool (*getVowelChecker(const char *lang))(char) {
+    if (lang != NULL && strcmp(lang, "fr") == 0)
+        return &isFrenchVowel;
+    return &isStandardVowel;
+}
+
+// static int filter(int argc, char *argv[]) {
+//     if(argc > 1) {
+//         fdprintf(STDERR, "Usage: filter optional: <fr>\n");
+//         return ERROR;
+//     }
+//     char c;
+//     char vocales[BUFFER_SIZE];
+//     int idx = 0;
+
+//     bool (*isVowel)(char) = getVowelChecker((argc == 1) ? argv[0] : NULL);
+
+//     while((c = getchar()) != EOF) {
+//         if(c) {
+//             putchar(c);
+//             if(isVowel(c) || (c == ' ' && idx > 0 && vocales[idx - 1] != ' ')) {
+//                 vocales[idx++] = c;
+//             } else if (c == '\b' && idx > 0 && isVowel(vocales[idx - 1])) {
+//                 idx--;
+//             }
+//         }
+//     }
+//     vocales[idx] = '\0';
+//     fdprintf(ORANGE, "\nReached EOF.\n");
+//     if (argc == 1 && strcmp(argv[0], "fr") == 0) {
+//         fdprintf(BLUE, "Vocales (fr): %s\n", vocales);
+//     } else {
+//         fdprintf(BLUE, "Vocales: %s\n", vocales);
+//     }
+//     return OK;
+// }
+
+static uint8_t is_vowel_or_line_break(char c) {
+	return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' ||
+		   c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == '\n';
+}
+
+static int filter(int argc, char *argv[]) {
+	if (argc != 0) {
+		printf("filter: Invalid amount of arguments.\n");
+		return -1;
+	}
+
+	int c;
+	while ((c = getchar()) != EOF) {
+		if (is_vowel_or_line_break(c))
+			putchar(c);
+	}
+
+	return 0;
 }

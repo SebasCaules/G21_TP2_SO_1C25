@@ -3,7 +3,7 @@
 #include <process.h>
 #include <stddef.h>
 #include <time.h>
-
+#include "syscalls.h"
 
 
 typedef struct scheduler_t {
@@ -286,17 +286,8 @@ void getFds(int* fds) {
 
 
 int sleepBlock(uint16_t pid, uint8_t sleep) {
-    if (pid == 0) {
-        return -2;
-    }
-    if (scheduler == NULL) {
-        return -3;
-    }
-    if (scheduler->processes[pid] == NULL) {
-        return -4;
-    }
-    if (scheduler->processes[pid]->status == TERMINATED) {
-        return -5;
+    if(pid == 0 || scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL || scheduler->processes[pid]->status == TERMINATED) {
+        return -1;
     }
 
     if (sleep == 0) {
@@ -330,8 +321,7 @@ void updateStdinWait(uint8_t value) {
     if (scheduler == NULL || scheduler->current == NO_PID) {
         return;
     }
-    process_t *currentProcess = scheduler->processes[scheduler->current];
-    currentProcess->waiting_for_stdin = value;
+    scheduler->processes[scheduler->current]->waiting_for_stdin = value;
 }
 
 
@@ -384,18 +374,6 @@ static process_t* getNextProcess(void) {
         }
         current = (current + 1) % MAX_PROCESSES;
     } while (current != start);
-
-    // do {
-	// 	if (scheduler->processes[current] != NULL &&
-	// 		scheduler->processes[current]->status == READY) {
-	// 		scheduler->current = current;
-	// 		scheduler->processes[current]->remaining_quantum =
-	// 			scheduler->processes[current]->priority - 1;
-	// 		return scheduler->processes[current];
-	// 	}
-	// 	current = (current + 1) % MAX_PROCESSES;
-	// } while (current != start);
-    
     return NULL;
 }
 

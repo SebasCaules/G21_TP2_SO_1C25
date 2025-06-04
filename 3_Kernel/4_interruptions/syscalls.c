@@ -101,16 +101,41 @@ int64_t sys_set_font_scale(uint64_t scale) {
 }
 
 int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
-    unsigned char character;
-    uint64_t i = 0;
-    while (i < length && (character = bufferNext()) != 0) {
-        if (character == '\r' || character == '\n') {
-            buffer[i++] = '\n';  // Store newline in buffer
-            break;               // Exit on newline
-        }
-        buffer[i++] = character;
-    }
-    return i;
+    // unsigned char character;
+    // uint64_t i = 0;
+    // while (i < length && (character = bufferNext()) != 0) {
+    //     if (character == '\r' || character == '\n') {
+    //         buffer[i++] = '\n';  // Store newline in buffer
+    //         break;               // Exit on newline
+    //     }
+    //     buffer[i++] = character;
+    // }
+    // return i;
+    if (fd < 0 || length <= 0)
+		return -1;
+
+	if (fd == STDIN) {
+		int fds[2];
+		getFds(fds);
+		if (fds[0] != STDIN) {
+			return readPipe(fds[0], buffer, length);
+		}
+		else {
+			for (int i = 0; i < length; i++) {
+				char c = kb_getchar();
+				if (c == 0) { 
+					return i;
+				}
+                // if(c == -1) {
+                //     return c;
+                // }
+				buffer[i] = c;
+			}
+			return length;
+		}
+	}
+	// if the file descriptor is not STDIN, it must be a pipe
+	return readPipe(fd, buffer, length);
 }
 
 int64_t sys_write(uint64_t fd, uint16_t * buffer, uint64_t length) {
