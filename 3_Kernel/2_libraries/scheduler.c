@@ -10,6 +10,7 @@ typedef struct scheduler_t {
     process_t* processes[MAX_PROCESSES + 1];
     uint16_t current;
     uint8_t size;
+    uint16_t total_cpu_ticks; // Total CPU ticks across all processes
 } scheduler_t;
 
 extern void _hlt();
@@ -23,6 +24,8 @@ static process_t* getNextProcess(void);
 static void removeProcess(uint16_t pid);
 static void adoptChildren(int16_t pid);
 
+uint64_t totalCPUTicks = 0;
+
 schedulerADT initScheduler(void) {
     if (scheduler != NULL) {
         return scheduler;
@@ -32,9 +35,10 @@ schedulerADT initScheduler(void) {
     for (int i = 0; i < MAX_PROCESSES; i++) {
         scheduler->processes[i] = NULL;
     }
-
+    
     scheduler->current = NO_PID;
     scheduler->size = 0;
+    scheduler->total_cpu_ticks = 0;
 
     char *argv[] = { NULL };
     int fds[2] = { STDIN, STDOUT };
@@ -47,6 +51,10 @@ schedulerADT getScheduler(void) {
     return scheduler;
 }
 
+int64_t getTotalCPUTicks() {
+    return totalCPUTicks;
+}
+
 void* schedule(void* prevRSP) {
     if (scheduler == NULL || scheduler->size == 0) {
         return prevRSP;
@@ -55,6 +63,8 @@ void* schedule(void* prevRSP) {
     if (scheduler->current != NO_PID) {
 		process_t *currentProcess = scheduler->processes[scheduler->current];
 		currentProcess->stack_pointer = prevRSP;
+        scheduler->processes[scheduler->current]->cpu_ticks += 1;
+        totalCPUTicks++;
 		if (currentProcess->status == RUNNING) {
 			currentProcess->status = READY;
 		}

@@ -406,7 +406,7 @@ void my_free(void *ptr) {
 
 int mem(int argc, char *argv[]) {
     if (argc != 0) {
-        printf("mem: Invalid amount of arguments.\n");
+        printf("mem: Invalid number of arguments.\n");
         return -1;
     }
 
@@ -579,13 +579,15 @@ char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
 
 int ps(int argc, char *argv[]) {
     if (argc != 0) {
-        printf("ps: Invalid amount of arguments.\n");
+        printf("ps: Invalid number of arguments.\n");
         return -1;
     }
 
     process_info_t *process_list = sys_ps();
     process_info_t *current = process_list;
-
+    // int totalCPUTicks = sys_total_cpu_ticks();
+    // int CPUPercent = (totalCPUTicks > 0) ? (current->cpuTicks * 100) / totalCPUTicks : 0;
+    
     // Encabezado alineado y ancho estándar
     fprint_padded_str(GRAY, "PID", 4);
     fprint_padded_str(GRAY, "PPID", 5);
@@ -595,6 +597,7 @@ int ps(int argc, char *argv[]) {
     fprint_padded_str(GRAY, "StackB", 9);
     fprint_padded_str(GRAY, "StackP", 10);
     fprint_padded_str(GRAY, "FG", 4);
+    // fprint_padded_str(GRAY, "CPU", 10);
     putchar('\n');
 
     char sbuf[16], sptrbuf[16];
@@ -622,6 +625,8 @@ int ps(int argc, char *argv[]) {
         convert_to_base_string((uint64_t)current->stackPointer, 16, sptrbuf);
         print_padded_str(sptrbuf, 10);
         print_padded_str(current->foreground ? "yes" : "no", 4);
+        // print_padded_int(CPUPercent, 10);
+        // printf("%d / %d", totalCPUTicks, current->cpuTicks);
         putchar('\n');
         current++;
     }

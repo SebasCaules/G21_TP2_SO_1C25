@@ -203,6 +203,8 @@ int64_t sys_waitpid(uint32_t pid);
 
 int64_t sys_ps();
 
+int64_t sys_total_cpu_ticks();
+
 int64_t sys_sem_open(char *name, uint64_t initialValue);
 
 int64_t sys_sem_close(char *name);

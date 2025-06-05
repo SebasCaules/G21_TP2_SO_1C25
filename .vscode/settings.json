@@ -28,6 +28,7 @@
         "colors.h": "c",
         "processinc.h": "c",
         "pipes.h": "c",
-        "snake.h": "c"
+        "snake.h": "c",
+        "spinlock.h": "c"
     }
 }

@@ -58,6 +58,7 @@ process_t *createProcess(
     p->status = READY;
     p->fd_out = fd_out;
     p->fd_in = fd_in;
+    p->cpu_ticks = 0;
 
     p->stack_base = my_malloc(STACK_SIZE);
     if (p->stack_base == NULL) {

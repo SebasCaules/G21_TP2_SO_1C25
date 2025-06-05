@@ -11,6 +11,8 @@ schedulerADT initScheduler(void);
 
 schedulerADT getScheduler(void);
 
+int64_t getTotalCPUTicks();
+
 void* schedule(void* prevRSP);
 
 int64_t addProcess(entry_point_t main, char** argv, char* name, 

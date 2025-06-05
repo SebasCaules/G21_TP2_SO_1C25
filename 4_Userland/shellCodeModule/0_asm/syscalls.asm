@@ -27,6 +27,7 @@ GLOBAL sys_block_process
 GLOBAL sys_unblock_process
 GLOBAL sys_yield
 GLOBAL sys_waitpid
+GLOBAL sys_total_cpu_ticks
 
 ; Synchronization syscalls
 GLOBAL sys_sem_open
@@ -198,6 +199,9 @@ sys_yield:
 
 sys_waitpid:
     sys_handler 24
+
+sys_total_cpu_ticks:
+    sys_handler 34
 
 ; Synchronization syscalls
 sys_sem_open:

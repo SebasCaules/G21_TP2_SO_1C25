@@ -4,7 +4,7 @@ static void toUtcMinus3(time_struct * time);
 
 static char username[MAX_USERNAME_LENGTH] = { 0 };
 
-int help();
+int help(int argc, char *argv[]);
 int showTime();
 int clearTerminal();
 int getRegs();
@@ -54,33 +54,48 @@ static module modules[] = {
 
 #define NUM_MODULES (sizeof(modules) / sizeof(modules[0]))
 
-int help() {
-    puts("Available Commands: ");
-    puts("  help            - Shows all available commands.");
-    puts("  time            - Display the current system time.");
-    puts("  setfont <scale> - Adjust the font size. (1 or 2)");
-    puts("  clear           - Clear the terminal screen.");
-    puts("  convert         - <base_1> <base_2> <number>");
-    puts("  snake           - Starts the Snake game.");
-    puts("  spotify         - Starts the spotify (clone) interface.");
-    puts("  piano           - Starts the piano interface.");
-    puts("  getregs         - Display the registers's contents.");
-    puts("  divzero         - Throws division by zero exc.");
-    puts("  opcode          - Throws invalid opcode exc.");
-    puts("  testmm          - Test the memory manager.");
-    puts("  ts <max_proc>   - Test the scheduler manager.");
-    puts("  tp              - Test the priority manager.");
-    puts("  tsem            - Test the semaphore manager.");
-    puts("  colorshow       - Show the color showcase.");
-    puts("  ps              - Show the process status.");
-    puts("  mem             - Show memory information.");
-    puts("  loop <ms>       - Loop of ID and greeting every couple of 100*ms.");
-    puts("  kill <pid>      - Kills the process with the given pid.");
-    puts("  nice            - <pid> <priority> Changes the priority of the process with the given pid.");
-    puts("  block <pid>     - Switches from blocked to ready state or vice versa.");
-    puts("  cat             - Displays the contents of a file.");
-    puts("  wc              - Counts the number of lines, words, and characters in a file.");
-    puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
+int help(int argc, char *argv[]) {
+    if (argc == 0) {
+        puts("Available Commands");
+        puts("  help            - Shows all available commands or help <category>.");
+        puts("  time            - Display the current system time.");
+        puts("  clear           - Clear the terminal screen.");
+        puts("  kill <pid>      - Kills the process with the given pid.");
+        puts("  nice            - <pid> <priority> Changes the priority of the process with the given pid.");
+        puts("  block <pid>     - Switches from blocked to ready state or vice versa.");
+        puts("  mem             - Show memory information.");
+        puts("  ps              - Show the process status.");
+        puts("  loop <ms>       - Loop of ID and greeting every couple of 100*ms.");
+        puts("  cat             - Displays the contents of a file.");
+        puts("  wc              - Counts the number of lines, words, and characters in a file.");
+        puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
+        puts("Type 'help util', 'help testing', or 'help fun' for more.");
+        return OK;
+    }
+    if (strcmp(argv[0], "util") == 0) {
+        puts("  setfont <scale> - Adjust the font size. (1 or 2)");
+        puts("  convert         - <base_1> <base_2> <number>");
+        puts("  time            - Display the current system time.");
+        return OK;
+    }
+    if (strcmp(argv[0], "testing") == 0) {
+        puts("  getregs         - Display the registers's contents.");
+        puts("  divzero         - Throws division by zero exc.");
+        puts("  opcode          - Throws invalid opcode exc.");
+        puts("  testmm          - Test the memory manager.");
+        puts("  ts <max_proc>   - Test the scheduler manager.");
+        puts("  tp              - Test the priority manager.");
+        puts("  tsem            - Test the semaphore manager.");
+        return OK;
+    }
+    if (strcmp(argv[0], "fun") == 0) {
+        puts("  snake           - Starts the Snake game.");
+        puts("  spotify         - Starts the spotify (clone) interface.");
+        puts("  piano           - Starts the piano interface.");
+        puts("  colorshow       - Show the color showcase.");
+        return OK;
+    }
+    puts("Unknown help category. Available: util, testing, fun.");
     return OK;
 }
 
@@ -319,7 +334,7 @@ void initShell() {
     printf(WELCOME_MESSAGE, username);
     showTime();
     putchar('\n');
-    help();
+    help(0, "");
     putchar('\n');
 }
 
@@ -383,7 +398,6 @@ int colorShowcase() {
     }
 
     puts("\n=== End of Color Parade ===");
-    puts("Use these color codes to make your shell stylish and expressive.");
     return OK;
 }
 

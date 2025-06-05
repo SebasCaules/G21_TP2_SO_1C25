@@ -6,6 +6,7 @@
 #include <time.h>
 #include <audioDriver.h>
 #include <naiveConsole.h>
+#include <scheduler.h>
 
 
 #define SYSCALL_COUNT (sizeof(syscall_table) / sizeof(syscall_fn))
@@ -60,6 +61,8 @@ syscall_fn syscall_table[] = {
     (syscall_fn)sys_read_pipe,         // 31
     (syscall_fn)sys_write_pipe,        // 32
     (syscall_fn)sys_ps,                // 33
+
+    (syscall_fn)sys_total_cpu_ticks,   // 34
 };
 
 uint64_t sysCallHandler(Registers * regs) {
@@ -237,6 +240,10 @@ int64_t sys_waitpid(uint32_t pid) {
 
 int64_t sys_ps() {
     return (int64_t)processStatus();
+}
+
+int64_t sys_total_cpu_ticks() {
+    return getTotalCPUTicks();
 }
 
 // Synchronization related syscalls

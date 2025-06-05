@@ -32,6 +32,8 @@ typedef struct process {
     uint16_t fd_out;
 
     uint8_t waiting_for_stdin;
+
+    uint64_t cpu_ticks; // para trackear el uso de CPU (eventualmente)
 } process_t;
 
 /**
