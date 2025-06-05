@@ -5,9 +5,14 @@
 #include <memoryManager.h>
 #include <synchro.h>
 #include <stddef.h>
+#include "colors.h"
 
 #define MAX_PIPES 64
 #define PIPE_SIZE 1024
+
+#define BUILTIN_FDS FDS_COUNT
+#define NAME_SIZE 64
+#define EOF -1
 
 void initPipes();
 int createPipe(int fds[2]);

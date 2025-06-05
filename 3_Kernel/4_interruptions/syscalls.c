@@ -101,16 +101,6 @@ int64_t sys_set_font_scale(uint64_t scale) {
 }
 
 int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
-    // unsigned char character;
-    // uint64_t i = 0;
-    // while (i < length && (character = bufferNext()) != 0) {
-    //     if (character == '\r' || character == '\n') {
-    //         buffer[i++] = '\n';  // Store newline in buffer
-    //         break;               // Exit on newline
-    //     }
-    //     buffer[i++] = character;
-    // }
-    // return i;
     if (fd < 0 || length <= 0)
 		return -1;
 
@@ -118,7 +108,8 @@ int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
 		int fds[2];
 		getFds(fds);
 		if (fds[0] != STDIN) {
-			return readPipe(fds[0], buffer, length);
+			int64_t read = readPipe(fds[0], buffer, length);
+			return read == 0 ? EOF : read;
 		}
 		else {
 			for (int i = 0; i < length; i++) {
@@ -132,11 +123,24 @@ int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
 		}
 	}
 	// if the file descriptor is not STDIN, it must be a pipe
-	return readPipe(fd, buffer, length);
+	int64_t read = readPipe(fd, buffer, length);
+	return read == 0 ? EOF : read;
 }
 
 int64_t sys_write(uint64_t fd, uint16_t * buffer, uint64_t length) {
-    return printStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
+    if (fd < 1 || length <= 0)
+        return -1;
+
+    if (fd < BUILTIN_FDS) {
+        int fds[2];
+        getFds(fds);
+        if (fds[1] > BUILTIN_FDS) {
+            return writePipe(fds[1], buffer, length);
+        }
+        return printStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
+    }
+    // if the file descriptor is not a builtin FD, it must be a pipe
+    return writePipe(fd, buffer, length);
 }
 
 int64_t sys_clear() {

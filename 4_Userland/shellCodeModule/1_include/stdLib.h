@@ -28,7 +28,6 @@ typedef enum {
 
 extern char *status_string[];
 
-
 /**
  * @brief Prints formatted output to the specified file descriptor.
  * @param fd The file descriptor to print to.
@@ -53,6 +52,12 @@ int	printf(const char * str, ...);
  */
 int getchar();
 
+
+/**
+ * @brief Reads a single character from standard input without waiting for input.
+ * @return The character read, or -1 if EOF is reached.
+ */
+int getCharNoWait();
 
 /**
  * @brief Reads a single character input.

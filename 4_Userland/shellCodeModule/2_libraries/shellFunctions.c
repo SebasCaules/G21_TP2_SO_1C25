@@ -26,14 +26,6 @@ static int filter(int argc, char *argv[]);
 
 static uint8_t foreground = 1;
 
-int printA(int argc, char *argv[]) {
-    while (1) {
-        putchar('A');
-        putchar('\n');
-    }
-    return 0;
-}
-
 static module modules[] = {
     {"help", 1, &help},
     {"time", 1, &showTime},
@@ -52,7 +44,6 @@ static module modules[] = {
     {"tsem", 0, (EntryPoint)&test_sync},
     {"colorshow", 1, &colorShowcase},
     {"ps", 0, (EntryPoint) &ps},
-    {"printA", 0, (EntryPoint) &printA},
     {"mem", 0, (EntryPoint) &mem},
     {"loop", 0, (EntryPoint) &loop},
     {"kill", 1, &killCommand},
@@ -84,7 +75,6 @@ int help() {
     puts("  tsem            - Test the semaphore manager.");
     puts("  colorshow       - Show the color showcase.");
     puts("  ps              - Show the process status.");
-    puts("  printA          - Prints A forever.");
     puts("  mem             - Show memory information.");
     puts("  loop <ms>       - Loop of ID and greeting every couple of 100*ms.");
     puts("  kill <pid>      - Kills the process with the given pid.");
@@ -233,197 +223,92 @@ static int fillCommandAndArgs(char **command, char *args[], char *input) {
 	return argsCount;
 }
 
-// int getCmdInput(char* command) {
-//     if(strlen(command) == 0){
-//         return;
-//     }
+int getCmdInput(char* command) {
+    if(strlen(command) == 0){
+        return;
+    }
     
-//     executable_command_t executable_commands[MAX_COMMANDS];
-// 	for (int i = 0; i < MAX_COMMANDS; i++) {
-// 		executable_commands[i].pid = -1;
-// 	}
-    
-//     char *pipe_pos = strchr(command, '|');
-// 	size_t executable_command_count = pipe_pos == NULL ? 1 : 2;
-// 	if (pipe_pos) {
-//         *pipe_pos = 0;
-// 		if (strchr(pipe_pos + 1, '|')) {
-//             fdprintf(STDERR, "Error: Only one pipe is allowed.\n");
-// 			return ERROR;
-// 		}
-// 	};
-    
-//     for (int i = 0; i < executable_command_count; i++) {
-//         executable_commands[i].argc = fillCommandAndArgs(
-//             &executable_commands[i].command, executable_commands[i].args, command);
-//         if (executable_commands[i].argc == ERROR) {
-//             return ERROR;
-//         }
-//         if (pipe_pos) {
-//             command = pipe_pos + 1;
-//         }
-//     }
-
-//     if (pipe_pos) {
-// 		int pipefds[2];
-// 		if (createPipe(pipefds) == -1) {
-//             fdprintf(STDERR, "Error creating pipe.\n");
-// 			return ERROR;
-// 		}
-//         printf("Pipe created with fds: %d, %d\n", pipefds[0], pipefds[1]);
-// 		executable_commands[0].fds[1] = pipefds[1];
-// 		executable_commands[1].fds[0] = pipefds[0];
-// 		executable_commands[1].fds[1] = STDOUT;
-// 		executable_commands[0].fds[0] = STDIN;
-//         printf("Entra %d, pasa %d va a %d y sale por %d\n",
-//             executable_commands[0].fds[0], executable_commands[0].fds[1],
-//             executable_commands[1].fds[0], executable_commands[1].fds[1]); 
-// 	}
-// 	else {
-// 		executable_commands[0].fds[0] = foreground ? STDIN : -1;
-// 		executable_commands[0].fds[1] = STDOUT;
-// 	}
-
-//     for (int i = 0; i < executable_command_count; i++) {
-//         uint8_t found = 0;
-//         for (int j = 0; j < NUM_MODULES; j++) {
-//             if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
-//                 found = 1;
-//                 if (modules[j].builtin) {
-//                     return modules[j].function(executable_commands[i].argc, executable_commands[i].args);
-//                 } else {
-//                     executable_commands[i].pid = newProcess(
-//                         modules[j].function, executable_commands[i].args,
-//                         executable_commands[i].command, 0, executable_commands[i].fds);
-//                     if (executable_commands[i].pid == -1) {
-//                         fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
-//                         return ERROR;
-//                     }
-                    
-//                 }
-//                 break;
-//             }
-//         }
-//         if (!found) {
-//             fdprintf(STDERR, "Command not found: %s\n", executable_commands[i].command);
-//             for (int j = 0; j < executable_command_count; j++) {
-//                 if (executable_commands[j].pid != -1) {
-//                     kill(executable_commands[j].pid);
-//                 }
-//             }
-//             return ERROR;
-//         }
-//     }
-//     if (foreground) {
-// 		for (int i = 0; i < executable_command_count; i++) {
-// 			if (executable_commands[i].pid != -1) {
-// 				waitPid(executable_commands[i].pid);
-// 			}
-// 		}
-// 		if (pipe_pos) {
-//             printf("Pipe destroying\n");
-// 			destroyPipe(executable_commands[0].fds[1]);
-// 		}
-// 	}
-// 	return OK;
-// }
-
-int getCmdInput(char *input) {
-	if (input == NULL) {
-		return ERROR;
-	}
-
-	executable_command_t executable_commands[MAX_COMMANDS];
+    executable_command_t executable_commands[MAX_COMMANDS];
 	for (int i = 0; i < MAX_COMMANDS; i++) {
 		executable_commands[i].pid = -1;
 	}
-
-	char *pipe_pos = strchr(input, '|');
+    
+    char *pipe_pos = strchr(command, '|');
 	size_t executable_command_count = pipe_pos == NULL ? 1 : 2;
 	if (pipe_pos) {
-		*pipe_pos = 0;
+        *pipe_pos = 0;
 		if (strchr(pipe_pos + 1, '|')) {
             fdprintf(STDERR, "Error: Only one pipe is allowed.\n");
 			return ERROR;
 		}
 	};
+    
+    for (int i = 0; i < executable_command_count; i++) {
+        executable_commands[i].argc = fillCommandAndArgs(
+            &executable_commands[i].command, executable_commands[i].args, command);
+        if (executable_commands[i].argc == ERROR) {
+            return ERROR;
+        }
+        if (pipe_pos) {
+            command = pipe_pos + 1;
+        }
+    }
 
-	for (int i = 0; i < executable_command_count; i++) {
-		executable_commands[i].argc = fillCommandAndArgs(
-			&executable_commands[i].command, executable_commands[i].args, input);
-		if (executable_commands[i].argc == ERROR) {
-			return ERROR;
-		}
-		if (pipe_pos)
-			input = pipe_pos + 1;
-	}
-
-	if (pipe_pos) {
+    if (pipe_pos) {
 		int pipefds[2];
 		if (createPipe(pipefds) == -1) {
             fdprintf(STDERR, "Error creating pipe.\n");
 			return ERROR;
 		}
-		printf("Pipe created with fds: %d, %d\n", pipefds[0], pipefds[1]);
 		executable_commands[0].fds[1] = pipefds[1];
 		executable_commands[1].fds[0] = pipefds[0];
 		executable_commands[1].fds[1] = STDOUT;
 		executable_commands[0].fds[0] = STDIN;
-		printf("Entra %d, pasa %d va a %d y sale por %d\n",
-				executable_commands[0].fds[0], executable_commands[0].fds[1],
-				executable_commands[1].fds[0], executable_commands[1].fds[1]); 
 	}
 	else {
 		executable_commands[0].fds[0] = foreground ? STDIN : -1;
 		executable_commands[0].fds[1] = STDOUT;
 	}
 
-	for (int i = 0; i < executable_command_count; i++) {
-		uint8_t found = 0;
-		for (int j = 0; j < NUM_MODULES; j++) {
-			if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
-				found = 1;
-				if (modules[j].builtin) {
-					return modules[j].function(executable_commands[i].argc,
-												executable_commands[i].args);
-				}
-				else {
-					executable_commands[i].pid = newProcess(
-						modules[j].function, executable_commands[i].args,
-						executable_commands[i].command, 0, executable_commands[i].fds);
-					if (executable_commands[i].pid == -1) {
-                        fdprintf(STDERR, "Error creating process for command: %s\n",
-                                   executable_commands[i].command);
-						return ERROR;
-					}
-				}
-				break;
-			}
-		}
-		if (!found) {
+    for (int i = 0; i < executable_command_count; i++) {
+        uint8_t found = 0;
+        for (int j = 0; j < NUM_MODULES; j++) {
+            if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
+                found = 1;
+                if (modules[j].builtin) {
+                    return modules[j].function(executable_commands[i].argc, executable_commands[i].args);
+                } else {
+                    executable_commands[i].pid = newProcess(
+                        modules[j].function, executable_commands[i].args,
+                        executable_commands[i].command, 0, executable_commands[i].fds);
+                    if (executable_commands[i].pid == -1) {
+                        fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
+                        return ERROR;
+                    }
+                }
+                break;
+            }
+        }
+        if (!found) {
             fdprintf(STDERR, "Command not found: %s\n", executable_commands[i].command);
-			for (int j = 0; j < executable_command_count; j++) {
-				if (executable_commands[j].pid != -1) {
-					kill(executable_commands[j].pid);
-				}
-			}
-			return ERROR;
-		}
-	}
-
-	if (foreground) {
+            for (int j = 0; j < executable_command_count; j++) {
+                if (executable_commands[j].pid != -1) {
+                    kill(executable_commands[j].pid);
+                }
+            }
+            return ERROR;
+        }
+    }
+    if (foreground) {
 		for (int i = 0; i < executable_command_count; i++) {
 			if (executable_commands[i].pid != -1) {
 				waitPid(executable_commands[i].pid);
 			}
 		}
 		if (pipe_pos) {
-			printf("Destroying pipe with fds: %d\n",
-				   executable_commands[0].fds[1]);
 			destroyPipe(executable_commands[0].fds[1]);
 		}
 	}
-
 	return OK;
 }
 
@@ -584,17 +469,6 @@ static int blockUnblock(int argc, char *argv[]) {
     return OK;
 }
 
-// static int cat(int argc, char *argv[]) {
-//     char c;
-//     while((c = getchar()) != EOF) {
-//         if(c){
-//             putchar(c);
-//         }
-//     }
-//     fdprintf(ORANGE, "\nReached EOF.\n");
-//     return OK;
-// }
-
 static int cat(int argc, char **argv) {
 	if (argc != 0) {
 		printf("cat: Invalid amount of arguments.\n");
@@ -602,7 +476,7 @@ static int cat(int argc, char **argv) {
 	}
 
 	int c;
-	while ((c = getchar()) != EOF) {
+	while ((c = getCharNoWait()) != EOF) {
 		if (c)
 			putchar(c);
 	}
@@ -613,7 +487,7 @@ static int cat(int argc, char **argv) {
 static int wc(int argc, char *argv[]) {
     char c;
     int lines = 0, words = 0, chars = 0;
-    while((c = getchar()) != EOF) {
+    while((c = getCharNoWait()) != EOF) {
         if(c){
             putchar(c);
             chars++;
@@ -645,53 +519,33 @@ static bool (*getVowelChecker(const char *lang))(char) {
     return &isStandardVowel;
 }
 
-// static int filter(int argc, char *argv[]) {
-//     if(argc > 1) {
-//         fdprintf(STDERR, "Usage: filter optional: <fr>\n");
-//         return ERROR;
-//     }
-//     char c;
-//     char vocales[BUFFER_SIZE];
-//     int idx = 0;
-
-//     bool (*isVowel)(char) = getVowelChecker((argc == 1) ? argv[0] : NULL);
-
-//     while((c = getchar()) != EOF) {
-//         if(c) {
-//             putchar(c);
-//             if(isVowel(c) || (c == ' ' && idx > 0 && vocales[idx - 1] != ' ')) {
-//                 vocales[idx++] = c;
-//             } else if (c == '\b' && idx > 0 && isVowel(vocales[idx - 1])) {
-//                 idx--;
-//             }
-//         }
-//     }
-//     vocales[idx] = '\0';
-//     fdprintf(ORANGE, "\nReached EOF.\n");
-//     if (argc == 1 && strcmp(argv[0], "fr") == 0) {
-//         fdprintf(BLUE, "Vocales (fr): %s\n", vocales);
-//     } else {
-//         fdprintf(BLUE, "Vocales: %s\n", vocales);
-//     }
-//     return OK;
-// }
-
-static uint8_t is_vowel_or_line_break(char c) {
-	return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' ||
-		   c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == '\n';
-}
-
 static int filter(int argc, char *argv[]) {
-	if (argc != 0) {
-		printf("filter: Invalid amount of arguments.\n");
-		return -1;
-	}
+    if(argc > 1) {
+        fdprintf(STDERR, "Usage: filter optional: <fr>\n");
+        return ERROR;
+    }
+    char c;
+    char vocales[BUFFER_SIZE];
+    int idx = 0;
 
-	int c;
-	while ((c = getchar()) != EOF) {
-		if (is_vowel_or_line_break(c))
-			putchar(c);
-	}
+    bool (*isVowel)(char) = getVowelChecker((argc == 1) ? argv[0] : NULL);
 
-	return 0;
+    while((c = getCharNoWait()) != EOF) {
+        if(c) {
+            putchar(c);
+            if(isVowel(c) || (c == ' ' && idx > 0 && vocales[idx - 1] != ' ')) {
+                vocales[idx++] = c;
+            } else if (c == '\b' && idx > 0 && isVowel(vocales[idx - 1])) {
+                idx--;
+            }
+        }
+    }
+    vocales[idx] = '\0';
+    fdprintf(ORANGE, "\nReached EOF.\n");
+    if (argc == 1 && strcmp(argv[0], "fr") == 0) {
+        fdprintf(BLUE, "Vocales (fr): %s\n", vocales);
+    } else {
+        fdprintf(BLUE, "Vocales: \n%s\n", vocales);
+    }
+    return OK;
 }

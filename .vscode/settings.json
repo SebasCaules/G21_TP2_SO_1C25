@@ -26,6 +26,7 @@
         "memorymanager.h": "c",
         "strlib.h": "c",
         "colors.h": "c",
-        "processinc.h": "c"
+        "processinc.h": "c",
+        "pipes.h": "c"
     }
 }

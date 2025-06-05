@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <time.h>
 #include "syscalls.h"
-
+#include "keyboard.h"
 
 typedef struct scheduler_t {
     process_t* processes[MAX_PROCESSES + 1];
@@ -163,6 +163,13 @@ int32_t killProcess(uint16_t pid) {
     }
     uint8_t contextSwitch = scheduler->processes[pid]->status == RUNNING;
     remove_sleeping_process(pid);
+    remove_process_from_all_semaphore_queues(pid);
+    if (process->fd_out != STDOUT) {
+		send_pipe_eof(process->fd_out);
+	}
+    if (process->waiting_for_stdin) {
+		release_stdin();
+	}
     removeProcess(pid);
 
     if (contextSwitch) {
@@ -241,6 +248,10 @@ void myExit(int64_t retValue) {
     }
     
     process_t *currentProcess = scheduler->processes[scheduler->current];
+
+    if (currentProcess->fd_out != STDOUT) {
+		send_pipe_eof(currentProcess->fd_out);
+	}
     
     currentProcess->status = TERMINATED;
     currentProcess->return_value = retValue;

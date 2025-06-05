@@ -177,6 +177,15 @@ int getchar() {
     return(char) c;
 }
 
+int getCharNoWait() {
+    char c;
+    int ret = sys_read(STDIN, &c, 1);
+    if (ret == EOF) {
+        return EOF;
+    }
+    return (char)c;
+}
+
 int readInput(char * c) {
     return sys_read(STDIN, (uint16_t *)c, 1);
 }
