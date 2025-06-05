@@ -1,6 +1,4 @@
-#include <stdLib.h>
 #include "shellFunctions.h"
-#include "colors.h"
 
 static void toUtcMinus3(time_struct * time);
 
@@ -80,6 +78,9 @@ int help() {
     puts("  kill <pid>      - Kills the process with the given pid.");
     puts("  nice            - <pid> <priority> Changes the priority of the process with the given pid.");
     puts("  block <pid>     - Switches from blocked to ready state or vice versa.");
+    puts("  cat             - Displays the contents of a file.");
+    puts("  wc              - Counts the number of lines, words, and characters in a file.");
+    puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
     return OK;
 }
 

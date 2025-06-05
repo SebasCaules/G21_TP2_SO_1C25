@@ -152,9 +152,21 @@ void beep(int freq, int milliseconds);
  */
 char* convert(int argc, char *argv[]);
 
-// Cambiar por strToInt
+/**
+ * @brief Converts a number to a string representation in a specified base.
+ * @param number The number to convert.
+ * @param base The base to convert to (e.g., 2 for binary, 10 for decimal).
+ * @param buffer The buffer to store the resulting string.
+ * @return The length of the resulting string.
+ */
 int64_t satoi (char * str, int64_t * flag);
 
+
+/**
+ * @brief Converts a string to an integer.
+ * @param str The string to convert.
+ * @return The converted integer value.
+ */
 int64_t atoi(char * str);
 
 void * my_malloc(uint64_t size);
