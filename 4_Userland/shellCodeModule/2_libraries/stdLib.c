@@ -434,24 +434,75 @@ int mem(int argc, char *argv[]) {
         } else {
             printf("%s:  ", labels[i]);
         }
-        print_padded_int(val, 10);
+        print_padded_int(val, 8);
         fdprintf(BLUE,"(%d %s)\n", rounded, units[unitIndex]);
     }
 
-    return 0;
+    // Mostrar barra de carga ASCII del porcentaje de memoria usada con escala logarítmica simulada
+    uint32_t used = values[1];
+    uint32_t total = values[0];
+
+    int barWidth = 13;
+    uint64_t percentUsed = (100 * (uint64_t)used) / (uint64_t)total;
+
+    // Escala logarítmica simulada: más sensibilidad al principio
+    int filled = 0;
+    switch (percentUsed) {
+        case 0 ... 2:
+            filled = 1;
+            break;
+        case 3 ... 4:
+            filled = 2;
+        case 5 ... 7:
+            filled = 3;
+            break;
+        case 8 ... 9:
+            filled = 4;
+            break;
+        case 10 ... 19:
+            filled = 5;
+            break;
+        case 20 ... 29:
+            filled = 6;
+            break;
+        case 30 ... 39:
+            filled = 7;
+            break;
+        case 40 ... 49:
+            filled = 8;
+            break;
+        case 50 ... 59:
+            filled = 9;
+            break;
+        case 60 ... 69:
+            filled = 10;
+            break;
+        case 70 ... 79:
+            filled = 11;
+            break;
+        case 80 ... 89:
+            filled = 12;
+            break;
+        case 90 ... 100:
+            filled = 13;
+            break;
+        default:
+            break;
+    }
+    printf("[");
+    for (int i = 0; i < barWidth; i++) {
+        if (i < filled) {
+            fdprintf(STDMARK, "#");
+        } else {
+            putchar('-');
+        }
+    }
+    printf("] ");
+    print_padded_int(percentUsed, 1);
+    putchar('%');
+    putchar('\n');
+    return OK;
 }
-
-// int mem(int argc, char *argv[]) {
-// 	if (argc != 0) {
-// 		printf("mem: Invalid amount of arguments.\n");
-// 		return -1;
-// 	}
-
-// 	mem_info_t *mem_info = sys_mem_dump();
-// 	printf("Total memory: %d bytes\nUsed memory: %d bytes\nFree memory: %d bytes\n",
-// 		   mem_info->total_mem, mem_info->used_mem, mem_info->free_mem);
-// 	return 0;
-// }
 
 // Scheduler related functions
 
@@ -514,6 +565,14 @@ static void print_padded_str(const char *str, int width) {
     for (int i = 0; i < width - len; i++) putchar(' ');
 }
 
+static void fprint_padded_str(int fd, const char *str, int width) {
+    int len = 0;
+    const char *s = str;
+    while (*s++) len++;
+    fdprintf(fd, "%s", str);
+    for (int i = 0; i < width - len; i++) putchar(' ');
+}
+
 // #define PS_HEADER "PID  PPID Prio  Stat      Name\n"
 #define PS_HEADER "PID  PPID Prio Stat    Name\n"
 char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
@@ -528,14 +587,14 @@ int ps(int argc, char *argv[]) {
     process_info_t *current = process_list;
 
     // Encabezado alineado y ancho estándar
-    print_padded_str("PID", 4);
-    print_padded_str("PPID", 5);
-    print_padded_str("Prio", 5);
-    print_padded_str("Stat", 9);
-    print_padded_str("Name", 8);
-    print_padded_str("StackB", 9);
-    print_padded_str("StackP", 10);
-    print_padded_str("FG", 4);
+    fprint_padded_str(GRAY, "PID", 4);
+    fprint_padded_str(GRAY, "PPID", 5);
+    fprint_padded_str(GRAY, "Prio", 5);
+    fprint_padded_str(GRAY, "Stat", 12);
+    fprint_padded_str(GRAY, "Name", 8);
+    fprint_padded_str(GRAY, "StackB", 9);
+    fprint_padded_str(GRAY, "StackP", 10);
+    fprint_padded_str(GRAY, "FG", 4);
     putchar('\n');
 
     char sbuf[16], sptrbuf[16];
@@ -547,7 +606,16 @@ int ps(int argc, char *argv[]) {
             print_padded_int(current->ppid, 5);
         }
         print_padded_int(current->priority, 5);
-        print_padded_str(status_string[current->status], 9);
+        process_status_t status = current->status;
+        if (status == READY) {
+            fprint_padded_str(STDMARK, status_string[status], 12);
+        } else if (status == BLOCKED) {
+            fprint_padded_str(STDERR, status_string[status], 12);
+        } else if (status == RUNNING) {
+            fprint_padded_str(ORANGE, status_string[status], 12);
+        } else if (status == TERMINATED) {
+            fprint_padded_str(BLUE, status_string[status], 12);
+        }
         print_padded_str(current->name, 8);
         convert_to_base_string((uint64_t)current->stackBase, 16, sbuf);
         print_padded_str(sbuf, 9);
