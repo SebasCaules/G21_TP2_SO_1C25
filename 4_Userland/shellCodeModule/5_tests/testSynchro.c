@@ -13,7 +13,7 @@ void slowInc(int64_t *p, int64_t inc) {
 	yield();
 	aux += inc;
 	*p = aux;
-	printf("[test_sync] slowInc: %d -> %d\n", (int)aux - inc, (int)aux);
+	printf("slowInc: %d -> %d\n", (int)aux - inc, (int)aux);
 }
 
 uint64_t my_process_inc(int argc, char **argv) {
@@ -23,27 +23,27 @@ uint64_t my_process_inc(int argc, char **argv) {
 	int64_t flag;
 
 	if (argc != 3) {
-		printf("test_sync: ERROR: Invalid number of arguments\n");
-		return -1;
+		fdprintf(STDERR, "ERROR: Invalid number of arguments\n");
+		return ERROR;
 	}
 
 	if ((n = satoi(argv[0], &flag)) <= 0 || !flag) {
-		printf("test_sync: ERROR: Invalid argument\n");
-		return -1;
+		fdprintf(STDERR, "ERROR: Invalid argument\n");
+		return ERROR;
 	}
 	if ((inc = satoi(argv[1], &flag)) == 0 || !flag) {
-		printf("test_sync: ERROR: Invalid argument\n");
-		return -1;
+		fdprintf(STDERR, "ERROR: Invalid argument\n");
+		return ERROR;
 	}
 	if ((use_sem = satoi(argv[2], &flag)) < 0 || !flag) {
-		printf("test_sync: ERROR: Invalid argument\n");
-		return -1;
+		fdprintf(STDERR, "ERROR: Invalid argument\n");
+		return ERROR;
 	}
 
 	if (use_sem)
 		if (semOpen(SEM_ID, 1) == -1) {
-			printf("test_sync: ERROR opening semaphore\n");
-			return -1;
+			fdprintf(STDERR, "ERROR opening semaphore\n");
+			return ERROR;
 		}
 
 	uint64_t i;
@@ -66,18 +66,12 @@ uint64_t my_process_inc(int argc, char **argv) {
 
 uint64_t test_sync(int argc, char **argv) { //{n, use_sem, 0}
 	
-	printf("test_sync: received argc = %d\n", (int)argc);
-	
 	if (argc != 2) {
-		printf("test_sync: ERROR: Invalid number of arguments %d\n", (int)argc);
-		printf("test_sync: received argc = %d\n", (int)argc);
-		for (uint64_t j = 0; j < argc; j++) {
-			printf("test_sync: argv[%d] = '%s'\n", (int)j, argv[j]);
-		}
-		return -1;
+		fdprintf(STDERR, "ERROR: Invalid argc = %d\n", (int)argc);
+		return ERROR;
 	}
 	
-	printf("test_sync: launching test with n = %s, use_sem = %s\n", argv[0], argv[1]);
+	fdprintf(STDOUT, "starting with n = %s, use_sem = %s\n", argv[0], argv[1]);
 	
 	uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 	char *argvDec[] = {argv[0], "-1", argv[1], NULL};
@@ -88,22 +82,20 @@ uint64_t test_sync(int argc, char **argv) { //{n, use_sem, 0}
 
 	uint64_t i;
 	for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-		printf("[test_sync] Creando proceso decrementador %d\n", i);
 		pids[i] = newProcess((EntryPoint) &my_process_inc, argvDec,
 									"my_process_dec", 0, fds);
-		printf("[test_sync] Creando proceso incrementador %d\n", i);
+		fdprintf(BLUE, "proc_dec %d PID: %d\n", i, pids[i]);
 		pids[i + TOTAL_PAIR_PROCESSES] = newProcess(
 			(EntryPoint) &my_process_inc, argvInc, "my_process_inc", 0, fds);
-			printf("global = %d\n", global);
+		fdprintf(MAGENTA, "proc_inc %d PID: %d\n", i, pids[i + TOTAL_PAIR_PROCESSES]);
 	}
 
 	for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-		printf("[test_sync] Esperando proceso decrementador %d (pid = %d)\n", i, pids[i]);
+		fdprintf(ORANGE, "wait dec %d (pid %d)\n", i, pids[i]);
 		waitPid(pids[i]);
-    printf("[test_sync] Esperando proceso incrementador %d (pid = %d)\n", i, pids[i + TOTAL_PAIR_PROCESSES]);
+		fdprintf(YELLOW, "wait inc %d (pid %d)\n", i, pids[i + TOTAL_PAIR_PROCESSES]);
 		waitPid(pids[i + TOTAL_PAIR_PROCESSES]);
-		printf("global wait = %d\n", global);
 	}
-	printf("[test_sync] Final value: %d\n", global);
+	fdprintf(STDMARK, "FINAL = %d\n", global);
 	return 0;
 }

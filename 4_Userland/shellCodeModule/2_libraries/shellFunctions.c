@@ -233,92 +233,193 @@ static int fillCommandAndArgs(char **command, char *args[], char *input) {
 	return argsCount;
 }
 
-int getCmdInput(char* command) {
-    if(strlen(command) == 0){
-        return;
-    }
+// int getCmdInput(char* command) {
+//     if(strlen(command) == 0){
+//         return;
+//     }
     
-    executable_command_t executable_commands[MAX_COMMANDS];
+//     executable_command_t executable_commands[MAX_COMMANDS];
+// 	for (int i = 0; i < MAX_COMMANDS; i++) {
+// 		executable_commands[i].pid = -1;
+// 	}
+    
+//     char *pipe_pos = strchr(command, '|');
+// 	size_t executable_command_count = pipe_pos == NULL ? 1 : 2;
+// 	if (pipe_pos) {
+//         *pipe_pos = 0;
+// 		if (strchr(pipe_pos + 1, '|')) {
+//             fdprintf(STDERR, "Error: Only one pipe is allowed.\n");
+// 			return ERROR;
+// 		}
+// 	};
+    
+//     for (int i = 0; i < executable_command_count; i++) {
+//         executable_commands[i].argc = fillCommandAndArgs(
+//             &executable_commands[i].command, executable_commands[i].args, command);
+//         if (executable_commands[i].argc == ERROR) {
+//             return ERROR;
+//         }
+//         if (pipe_pos) {
+//             command = pipe_pos + 1;
+//         }
+//     }
+
+//     if (pipe_pos) {
+// 		int pipefds[2];
+// 		if (createPipe(pipefds) == -1) {
+//             fdprintf(STDERR, "Error creating pipe.\n");
+// 			return ERROR;
+// 		}
+//         printf("Pipe created with fds: %d, %d\n", pipefds[0], pipefds[1]);
+// 		executable_commands[0].fds[1] = pipefds[1];
+// 		executable_commands[1].fds[0] = pipefds[0];
+// 		executable_commands[1].fds[1] = STDOUT;
+// 		executable_commands[0].fds[0] = STDIN;
+//         printf("Entra %d, pasa %d va a %d y sale por %d\n",
+//             executable_commands[0].fds[0], executable_commands[0].fds[1],
+//             executable_commands[1].fds[0], executable_commands[1].fds[1]); 
+// 	}
+// 	else {
+// 		executable_commands[0].fds[0] = foreground ? STDIN : -1;
+// 		executable_commands[0].fds[1] = STDOUT;
+// 	}
+
+//     for (int i = 0; i < executable_command_count; i++) {
+//         uint8_t found = 0;
+//         for (int j = 0; j < NUM_MODULES; j++) {
+//             if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
+//                 found = 1;
+//                 if (modules[j].builtin) {
+//                     return modules[j].function(executable_commands[i].argc, executable_commands[i].args);
+//                 } else {
+//                     executable_commands[i].pid = newProcess(
+//                         modules[j].function, executable_commands[i].args,
+//                         executable_commands[i].command, 0, executable_commands[i].fds);
+//                     if (executable_commands[i].pid == -1) {
+//                         fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
+//                         return ERROR;
+//                     }
+                    
+//                 }
+//                 break;
+//             }
+//         }
+//         if (!found) {
+//             fdprintf(STDERR, "Command not found: %s\n", executable_commands[i].command);
+//             for (int j = 0; j < executable_command_count; j++) {
+//                 if (executable_commands[j].pid != -1) {
+//                     kill(executable_commands[j].pid);
+//                 }
+//             }
+//             return ERROR;
+//         }
+//     }
+//     if (foreground) {
+// 		for (int i = 0; i < executable_command_count; i++) {
+// 			if (executable_commands[i].pid != -1) {
+// 				waitPid(executable_commands[i].pid);
+// 			}
+// 		}
+// 		if (pipe_pos) {
+//             printf("Pipe destroying\n");
+// 			destroyPipe(executable_commands[0].fds[1]);
+// 		}
+// 	}
+// 	return OK;
+// }
+
+int getCmdInput(char *input) {
+	if (input == NULL) {
+		return ERROR;
+	}
+
+	executable_command_t executable_commands[MAX_COMMANDS];
 	for (int i = 0; i < MAX_COMMANDS; i++) {
 		executable_commands[i].pid = -1;
 	}
-    
-    char *pipe_pos = strchr(command, '|');
+
+	char *pipe_pos = strchr(input, '|');
 	size_t executable_command_count = pipe_pos == NULL ? 1 : 2;
 	if (pipe_pos) {
-        *pipe_pos = 0;
+		*pipe_pos = 0;
 		if (strchr(pipe_pos + 1, '|')) {
             fdprintf(STDERR, "Error: Only one pipe is allowed.\n");
 			return ERROR;
 		}
 	};
-    
-    for (int i = 0; i < executable_command_count; i++) {
-        executable_commands[i].argc = fillCommandAndArgs(
-            &executable_commands[i].command, executable_commands[i].args, command);
-        if (executable_commands[i].argc == ERROR) {
-            return ERROR;
-        }
-        if (pipe_pos) {
-            command = pipe_pos + 1;
-        }
-    }
 
-    if (pipe_pos) {
+	for (int i = 0; i < executable_command_count; i++) {
+		executable_commands[i].argc = fillCommandAndArgs(
+			&executable_commands[i].command, executable_commands[i].args, input);
+		if (executable_commands[i].argc == ERROR) {
+			return ERROR;
+		}
+		if (pipe_pos)
+			input = pipe_pos + 1;
+	}
+
+	if (pipe_pos) {
 		int pipefds[2];
 		if (createPipe(pipefds) == -1) {
             fdprintf(STDERR, "Error creating pipe.\n");
 			return ERROR;
 		}
-        printf("Pipe created with fds: %d, %d\n", pipefds[0], pipefds[1]);
+		printf("Pipe created with fds: %d, %d\n", pipefds[0], pipefds[1]);
 		executable_commands[0].fds[1] = pipefds[1];
 		executable_commands[1].fds[0] = pipefds[0];
 		executable_commands[1].fds[1] = STDOUT;
 		executable_commands[0].fds[0] = STDIN;
+		printf("Entra %d, pasa %d va a %d y sale por %d\n",
+				executable_commands[0].fds[0], executable_commands[0].fds[1],
+				executable_commands[1].fds[0], executable_commands[1].fds[1]); 
 	}
 	else {
 		executable_commands[0].fds[0] = foreground ? STDIN : -1;
 		executable_commands[0].fds[1] = STDOUT;
 	}
 
-    for (int i = 0; i < executable_command_count; i++) {
-        uint8_t found = 0;
-        for (int j = 0; j < NUM_MODULES; j++) {
-            if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
-                found = 1;
-                if (modules[j].builtin) {
-                    return modules[j].function(executable_commands[i].argc, executable_commands[i].args);
-                } else {
-                    executable_commands[i].pid = newProcess(
-                        modules[j].function, executable_commands[i].args,
-                        executable_commands[i].command, 0, executable_commands[i].fds);
-                    if (executable_commands[i].pid == -1) {
-                        fdprintf(STDERR, "Error creating process for command: %s\n",  executable_commands[i].command);
-                        return ERROR;
-                    }
-                    
-                }
-                break;
-            }
-        }
-        if (!found) {
+	for (int i = 0; i < executable_command_count; i++) {
+		uint8_t found = 0;
+		for (int j = 0; j < NUM_MODULES; j++) {
+			if (strcmp(executable_commands[i].command, modules[j].name) == 0) {
+				found = 1;
+				if (modules[j].builtin) {
+					return modules[j].function(executable_commands[i].argc,
+												executable_commands[i].args);
+				}
+				else {
+					executable_commands[i].pid = newProcess(
+						modules[j].function, executable_commands[i].args,
+						executable_commands[i].command, 0, executable_commands[i].fds);
+					if (executable_commands[i].pid == -1) {
+                        fdprintf(STDERR, "Error creating process for command: %s\n",
+                                   executable_commands[i].command);
+						return ERROR;
+					}
+				}
+				break;
+			}
+		}
+		if (!found) {
             fdprintf(STDERR, "Command not found: %s\n", executable_commands[i].command);
-            for (int j = 0; j < executable_command_count; j++) {
-                if (executable_commands[j].pid != -1) {
-                    kill(executable_commands[j].pid);
-                }
-            }
-            return ERROR;
-        }
-    }
-    if (foreground) {
+			for (int j = 0; j < executable_command_count; j++) {
+				if (executable_commands[j].pid != -1) {
+					kill(executable_commands[j].pid);
+				}
+			}
+			return ERROR;
+		}
+	}
+
+	if (foreground) {
 		for (int i = 0; i < executable_command_count; i++) {
 			if (executable_commands[i].pid != -1) {
 				waitPid(executable_commands[i].pid);
 			}
 		}
 		if (pipe_pos) {
-            printf("Pipe destroying\n");
+			printf("Destroying pipe with fds: %d\n",
+				   executable_commands[0].fds[1]);
 			destroyPipe(executable_commands[0].fds[1]);
 		}
 	}

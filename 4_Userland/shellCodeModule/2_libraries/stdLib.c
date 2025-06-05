@@ -432,6 +432,18 @@ int mem(int argc, char *argv[]) {
     return 0;
 }
 
+// int mem(int argc, char *argv[]) {
+// 	if (argc != 0) {
+// 		printf("mem: Invalid amount of arguments.\n");
+// 		return -1;
+// 	}
+
+// 	mem_info_t *mem_info = sys_mem_dump();
+// 	printf("Total memory: %d bytes\nUsed memory: %d bytes\nFree memory: %d bytes\n",
+// 		   mem_info->total_mem, mem_info->used_mem, mem_info->free_mem);
+// 	return 0;
+// }
+
 // Scheduler related functions
 
 int64_t newProcess(EntryPoint main, char** argv, char* name, uint8_t unkillable, int* fileDescriptors) {

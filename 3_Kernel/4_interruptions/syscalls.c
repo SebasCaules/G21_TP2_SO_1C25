@@ -126,9 +126,6 @@ int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
 				if (c == 0) { 
 					return i;
 				}
-                // if(c == -1) {
-                //     return c;
-                // }
 				buffer[i] = c;
 			}
 			return length;

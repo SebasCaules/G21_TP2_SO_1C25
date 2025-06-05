@@ -1,9 +1,12 @@
-#include <synchro.h>
-#include <stddef.h>
-#include <scheduler.h>
-#include <spinlock.h>
-#include <memoryMap.h>
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <lib.h>
+#include <memoryMap.h>
+#include <memoryManager.h>
+#include <scheduler.h>
+#include <semaphore.h>
+#include <spinlock.h>
+#include <syscalls.h>
 
 typedef struct {
 	uint32_t v[MAX_PROCESSES];
@@ -19,6 +22,7 @@ typedef struct {
 	circular_buffer_t queue;
 	lock_t lock;
 } semaphore_t;
+
 typedef struct {
 	semaphore_t *semaphores[MAX_SEMAPHORES];
 	int semaphoresCount;
@@ -26,13 +30,20 @@ typedef struct {
 
 semaphore_manager_t *semaphoreManager = NULL;
 
+void strncpy(char *dest, const char *src, size_t size) {
+	for (size_t i = 0; i < size; i++) {
+		dest[i] = src[i];
+		if (src[i] == 0)
+			break;
+	}
+}
+
 static int64_t getFreeId();
 static uint64_t popFromQueue(semaphore_t *sem);
 static int addToQueue(semaphore_t *sem, uint32_t pid);
 static semaphore_t *getSemByName(char *name);
 static int getIdxByName(char *name);
 static int remove_process_from_queue(semaphore_t *sem, uint32_t pid);
-
 
 static int64_t getFreeId() {
 	for (int i = 0; i < MAX_SEMAPHORES; i++) {
@@ -78,37 +89,6 @@ static semaphore_t *getSemByName(char *name) {
 	return semaphoreManager->semaphores[idx];
 }
 
-static int remove_process_from_queue(semaphore_t *sem, uint32_t pid) {
-	if (sem->queue.size == 0)
-		return -1;
-
-	uint32_t i = sem->queue.readIndex;
-	uint32_t j = 0;
-	int found = -1;
-
-	while (j < sem->queue.size) {
-		if (sem->queue.v[i] == pid) {
-			found = i;
-			break;
-		}
-		i = (i + 1) % MAX_PROCESSES;
-		j++;
-	}
-
-	if (found == -1)
-		return -1;
-	for (uint32_t k = found; k != sem->queue.writeIndex; k = (k + 1) % MAX_PROCESSES) {
-		uint32_t next = (k + 1) % MAX_PROCESSES;
-		sem->queue.v[k] = sem->queue.v[next];
-	}
-
-	sem->queue.writeIndex =
-		(sem->queue.writeIndex + MAX_PROCESSES - 1) % MAX_PROCESSES;
-	sem->queue.size--;
-
-	return 0;
-}
-
 void initSemManager() {
 	if (semaphoreManager != NULL)
 		return;
@@ -141,7 +121,7 @@ int64_t semOpen(char *name, int initialValue) {
 		return -1;
 	}
 	sem->value = initialValue;
-	strncopy(sem->name, name, MAX_SEM_NAME_LENGTH);
+	strncpy(sem->name, name, MAX_SEM_NAME_LENGTH);
 	sem->queue.readIndex = 0;
 	sem->queue.writeIndex = 0;
 	sem->queue.size = 0;
@@ -217,6 +197,38 @@ int64_t semPost(char *name) {
 	}
 
 	release(&sem->lock);
+	return 0;
+}
+
+static int remove_process_from_queue(semaphore_t *sem, uint32_t pid) {
+	if (sem->queue.size == 0)
+		return -1;
+
+	uint32_t i = sem->queue.readIndex;
+	uint32_t j = 0;
+	int found = -1;
+
+	while (j < sem->queue.size) {
+		if (sem->queue.v[i] == pid) {
+			found = i;
+			break;
+		}
+		i = (i + 1) % MAX_PROCESSES;
+		j++;
+	}
+
+	if (found == -1)
+		return -1;
+	for (uint32_t k = found; k != sem->queue.writeIndex;
+		 k = (k + 1) % MAX_PROCESSES) {
+		uint32_t next = (k + 1) % MAX_PROCESSES;
+		sem->queue.v[k] = sem->queue.v[next];
+	}
+
+	sem->queue.writeIndex =
+		(sem->queue.writeIndex + MAX_PROCESSES - 1) % MAX_PROCESSES;
+	sem->queue.size--;
+
 	return 0;
 }
 

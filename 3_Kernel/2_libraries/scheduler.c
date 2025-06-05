@@ -16,6 +16,7 @@ extern void _hlt();
 extern void timer_tick();
 
 static schedulerADT scheduler = NULL;
+static uint8_t force_reschedule = 0;
 
 static int initMain(int argc, char **argv);
 static process_t* getNextProcess(void);
@@ -133,6 +134,7 @@ Qué debería hacer:
 * Puede ser tan simple como llamar a schedule(current_rsp); y hacer un return de ahí si el sistema lo permite.
 */
 void yield(void) {
+    force_reschedule = 1;
     timer_tick();
 }
 
@@ -356,7 +358,8 @@ static process_t* getNextProcess(void) {
     process_t *currentProcess = scheduler->processes[scheduler->current];
     if (currentProcess != NULL &&
 		(currentProcess->status == READY || currentProcess->status == RUNNING) &&
-		currentProcess->remaining_quantum > 0) {
+		currentProcess->remaining_quantum > 0 &&
+        !force_reschedule) {
 		currentProcess->remaining_quantum--;
 		return currentProcess;
 	}
@@ -370,10 +373,12 @@ static process_t* getNextProcess(void) {
         if (candidate != NULL && candidate->status == READY) {
             scheduler->current = current;
             candidate->remaining_quantum = candidate->priority;
+            force_reschedule = 0;
             return candidate;
         }
         current = (current + 1) % MAX_PROCESSES;
     } while (current != start);
+    force_reschedule = 0;
     return NULL;
 }
 

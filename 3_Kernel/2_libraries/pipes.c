@@ -1,4 +1,9 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+#include <lib.h>
+#include <memoryManager.h>
 #include <pipes.h>
+#include <synchro.h>
 
 #define BUILTIN_FDS 2
 #define NAME_SIZE 64
@@ -18,6 +23,17 @@ static uint16_t nextFd = BUILTIN_FDS;
 static pipe_t *pipes[MAX_PIPES];
 
 static int getIndexByFd(int fd, int pos);
+
+int strcat(char *dest, const char *src) {
+	size_t dest_len = strlen(dest);
+	size_t i;
+	for (i = 0; src[i] != '\0'; i++) {
+		dest[dest_len + i] = src[i];
+	}
+	dest[dest_len + i] = '\0';
+	return dest_len + i;
+}
+
 
 void initPipes() {
 	for (int i = 0; i < MAX_PIPES; i++) {
@@ -41,8 +57,8 @@ int createPipe(int fds[2]) {
 			fds[1] = pipes[i]->fds[1];
 			itoa(pipes[i]->fds[0], pipes[i]->writeSem);
 			itoa(pipes[i]->fds[1], pipes[i]->readSem);
-			strncat(pipes[i]->writeSem, "write");
-			strncat(pipes[i]->readSem, "read");
+			strcat(pipes[i]->writeSem, "_w");
+			strcat(pipes[i]->readSem, "_r");
 
 			if (semOpen(pipes[i]->writeSem, PIPE_SIZE) == -1) {
 				pipes[i] = NULL;
@@ -94,7 +110,6 @@ int readPipe(int fd, char *buffer, int bytes) {
 		pipe->size--;
 		semPost(pipe->writeSem);
 	}
-
 	return bytes;
 }
 
