@@ -585,9 +585,7 @@ int ps(int argc, char *argv[]) {
 
     process_info_t *process_list = sys_ps();
     process_info_t *current = process_list;
-    // int totalCPUTicks = sys_total_cpu_ticks();
-    // int CPUPercent = (totalCPUTicks > 0) ? (current->cpuTicks * 100) / totalCPUTicks : 0;
-    
+    int totalCPUTicks = sys_total_cpu_ticks();
     // Encabezado alineado y ancho estándar
     fprint_padded_str(GRAY, "PID", 4);
     fprint_padded_str(GRAY, "PPID", 5);
@@ -599,9 +597,10 @@ int ps(int argc, char *argv[]) {
     fprint_padded_str(GRAY, "FG", 4);
     // fprint_padded_str(GRAY, "CPU", 10);
     putchar('\n');
-
+    
     char sbuf[16], sptrbuf[16];
     while (current->pid != NO_PID) {
+        int CPUPercent = (totalCPUTicks > 0) ? (current->cpuTicks * 100) / totalCPUTicks : 0;
         print_padded_int(current->pid, 4);
         if(current->ppid < 0) {
             print_padded_str("-", 5);
@@ -625,8 +624,8 @@ int ps(int argc, char *argv[]) {
         convert_to_base_string((uint64_t)current->stackPointer, 16, sptrbuf);
         print_padded_str(sptrbuf, 10);
         print_padded_str(current->foreground ? "yes" : "no", 4);
-        // print_padded_int(CPUPercent, 10);
-        // printf("%d / %d", totalCPUTicks, current->cpuTicks);
+        print_padded_int(CPUPercent, 10);
+        printf("%d / %d", current->cpuTicks, totalCPUTicks);
         putchar('\n');
         current++;
     }

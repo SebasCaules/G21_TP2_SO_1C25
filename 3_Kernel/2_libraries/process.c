@@ -43,8 +43,6 @@ process_t *createProcess(
     uint16_t fd_in,
     uint16_t fd_out
 ) {
-    // sys_write(STDOUT, (uint16_t *)"Creating process...\n", 20);
-    // sys_write(STDOUT, (uint16_t *)name, strlength(name));
     process_t *p = my_malloc(sizeof(process_t));
     if (p == NULL)
         return NULL;
@@ -58,7 +56,7 @@ process_t *createProcess(
     p->status = READY;
     p->fd_out = fd_out;
     p->fd_in = fd_in;
-    p->cpu_ticks = 0;
+    p->cpuTicks = 0;
 
     p->stack_base = my_malloc(STACK_SIZE);
     if (p->stack_base == NULL) {
@@ -77,16 +75,8 @@ process_t *createProcess(
 
     strncopy(p->name, name, MAX_NAME_LENGTH - 1);
     p->name[MAX_NAME_LENGTH - 1] = 0;
-
-    // sys_write(STDOUT, (uint16_t *)"Before setup_stack_frame\n", 26);
     // Setup the initial stack frame
 	p->stack_pointer = setup_stack_frame(&processCaller, entry_point, p->stack_pointer, (void *) p->argv);
-    // sys_write(STDOUT, (uint16_t *)"After setup_stack_frame\n", 25);
-
-    char ary[] = {0, 0};
-    ary[0] = p->pid + '0'; // Convert PID to char
-    // sys_write(STDOUT, ary, 2);
-
     return p;
 }
 

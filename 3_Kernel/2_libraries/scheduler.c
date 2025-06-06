@@ -63,7 +63,7 @@ void* schedule(void* prevRSP) {
     if (scheduler->current != NO_PID) {
 		process_t *currentProcess = scheduler->processes[scheduler->current];
 		currentProcess->stack_pointer = prevRSP;
-        scheduler->processes[scheduler->current]->cpu_ticks += 1;
+        scheduler->processes[scheduler->current]->cpuTicks += 1;
         totalCPUTicks++;
 		if (currentProcess->status == RUNNING) {
 			currentProcess->status = READY;
@@ -240,7 +240,7 @@ process_info_t* processStatus(void) {
             info->stackPointer = proc->stack_pointer;
             info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
             info->status = proc->status;
-            info->cpuTicks = 0;  // para trackear el uso de CPU (eventualmente)
+            info->cpuTicks = proc->cpuTicks;  // para trackear el uso de CPU (eventualmente)
         }
     }
 

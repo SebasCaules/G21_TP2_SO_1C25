@@ -33,7 +33,7 @@ typedef struct process {
 
     uint8_t waiting_for_stdin;
 
-    uint64_t cpu_ticks; // para trackear el uso de CPU (eventualmente)
+    uint64_t cpuTicks; // para trackear el uso de CPU (eventualmente)
 } process_t;
 
 /**
