@@ -49,7 +49,8 @@ static module modules[] = {
     {"block", 1, &blockUnblock},
     {"cat", 0, (EntryPoint) &cat},
     {"wc", 0, (EntryPoint) &wc},
-    {"filter", 0, (EntryPoint) &filter}
+    {"filter", 0, (EntryPoint) &filter},
+    {"phylo", 0, (EntryPoint) &phylo},
 };
 
 #define NUM_MODULES (sizeof(modules) / sizeof(modules[0]))

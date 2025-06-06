@@ -13,6 +13,7 @@
 #include <testSynchro.h>
 #include "defs.h"
 #include "colors.h"
+#include "phylo.h"
 
 #define WELCOME_MESSAGE "Welcome to ChabonOS, %s!\n"
 #define PROMPT "%s@userland ~ "
