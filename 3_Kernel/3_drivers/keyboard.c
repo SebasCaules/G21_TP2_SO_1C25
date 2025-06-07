@@ -261,6 +261,11 @@ static volatile uint64_t registers[17];
 
 static volatile uint8_t registersFilled = 0;
 
+// Static control message arrays for sys_write
+static uint16_t ctrlS_msg[] = {'^', 'S'};
+static uint16_t ctrlD_msg[] = {'^', 'D'};
+static uint16_t ctrlC_msg[] = {'^', 'C'};
+
 int initKeyboardDriver() {
 	if (semOpen(KB_SEM_NAME, 0) == -1) {
 		return -1;
@@ -276,14 +281,14 @@ void pressedKey() {
 		if (ascii == 's' || ascii == 'S') {
 			registersFilled = 1;
 			updateRegisters();
-			sys_write(1, "^S", 2);
+			sys_write(1, ctrlS_msg, 2);
 		}
 		else if (ascii == 'd' || ascii == 'D') {
-			sys_write(1, "^D", 2);
+			sys_write(1, ctrlD_msg, 2);
 			send_eof_to_stdin();
 		}
 		else if (ascii == 'c' || ascii == 'C') {
-			sys_write(1, "^C", 2);
+			sys_write(1, ctrlC_msg, 2);
 			killForegroundProcess();
 		}
 	}

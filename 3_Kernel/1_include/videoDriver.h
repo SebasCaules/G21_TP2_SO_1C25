@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <font.h>
+#include "lib.h"
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768

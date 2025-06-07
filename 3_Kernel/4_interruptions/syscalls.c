@@ -1,12 +1,6 @@
-#include <stdint.h>
-#include <videoDriver.h>
-#include <keyboard.h>
 #include <syscalls.h>
-#include <rtc.h>
-#include <time.h>
-#include <audioDriver.h>
-#include <naiveConsole.h>
-#include <scheduler.h>
+#include <stdint.h>
+
 
 
 #define SYSCALL_COUNT (sizeof(syscall_table) / sizeof(syscall_fn))
@@ -111,7 +105,7 @@ int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
 		int fds[2];
 		getFds(fds);
 		if (fds[0] != STDIN) {
-			int64_t read = readPipe(fds[0], buffer, length);
+			int64_t read = readPipe(fds[0], (char *)buffer, length);
 			return read == 0 ? EOF : read;
 		}
 		else {
@@ -126,7 +120,7 @@ int64_t sys_read(uint64_t fd, uint16_t * buffer, uint64_t length) {
 		}
 	}
 	// if the file descriptor is not STDIN, it must be a pipe
-	int64_t read = readPipe(fd, buffer, length);
+	int64_t read = readPipe(fd, (char *)buffer, length);
 	return read == 0 ? EOF : read;
 }
 
@@ -138,12 +132,12 @@ int64_t sys_write(uint64_t fd, uint16_t * buffer, uint64_t length) {
         int fds[2];
         getFds(fds);
         if (fds[1] > BUILTIN_FDS) {
-            return writePipe(fds[1], buffer, length);
+            return writePipe(fds[1], (const char *)buffer, length);
         }
         return printStrByLength((char *)buffer, fileDescriptorStyle[fd], 0x00000000, length);
     }
     // if the file descriptor is not a builtin FD, it must be a pipe
-    return writePipe(fd, buffer, length);
+    return writePipe(fd, (const char *)buffer, length);
 }
 
 int64_t sys_clear() {

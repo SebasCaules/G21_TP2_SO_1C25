@@ -7,8 +7,12 @@
 #include <syscallsInt.h>
 #include <stdLib.h>
 
+
 #define MAX_BLOCKS 20
-// int64_t testMM ( char * argv[],  uint64_t argc );
+
+void * memset(void * destination, int32_t character, uint64_t length);
+void * memcpy(void * destination, const void * source, uint64_t length);
+
 int64_t testMM(uint64_t argc, char * argv[]);
 
 

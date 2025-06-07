@@ -173,13 +173,14 @@ int scanf(const char *format, ...) {
 
 int getchar() {
     int c;
-    while (sys_read(STDIN, &c, 1) == 0 || c > 255)
-    return(char) c;
+    while (sys_read(STDIN, (uint16_t *) &c, 1) == 0 || c > 255)
+        ;
+    return (char) c;
 }
 
 int getCharNoWait() {
     char c;
-    int ret = sys_read(STDIN, &c, 1);
+    int ret = sys_read(STDIN, (uint16_t *)&c, 1);
     if (ret == EOF) {
         return EOF;
     }
@@ -191,7 +192,7 @@ int readInput(char * c) {
 }
 
 int putchar(char c) {
-    return sys_write(STDOUT, &c, 1);
+    return sys_write(STDOUT, (uint16_t *)&c, 1);
 }
 
 int putsNoNewLine(const char *fmt) {
@@ -319,7 +320,7 @@ static void from_decimal(int decimal, int base, char *buffer) {
 char* convert(int argc, char *argv[]) {
     if (argc != 3) {
         fdprintf(STDERR, "Usage: convert <initBase> <finalBase> <num>\n", argc);
-        return ERROR;
+        return NULL;
     }
 
     char initBase = argv[0][0];
@@ -327,17 +328,16 @@ char* convert(int argc, char *argv[]) {
     char *num = argv[2];
     int initBaseValue = get_base_from_char(initBase);
     int finalBaseValue = get_base_from_char(finalBase);
-    static char bufferRet[BUFFER_SIZE];
 
     if (initBaseValue == -1 || finalBaseValue == -1) {
         fdprintf(STDERR, "The initial and final base must be one of: 'b', 'o', 'd', 'h'\n");
-        return ERROR;
+        return NULL;
     }
 
     int decimal = to_decimal(num, initBaseValue);
     if (decimal == -1) {
         fdprintf(STDERR, "Invalid number %s for base %c\n", num, initBase);
-        return ERROR;
+        return NULL;
     }
 
     char convertedNum[BUFFER_SIZE];
@@ -397,11 +397,11 @@ int64_t atoi(char * str) {
 // Memory Manager related functions
 
 void * my_malloc(uint64_t size) {
-    return sys_my_malloc(size);
+    return (void *) sys_my_malloc(size);
 }
 
 void my_free(void *ptr) {
-    return sys_my_free(ptr);
+    sys_my_free((uint64_t)ptr);
 }
 
 int mem(int argc, char *argv[]) {
@@ -410,10 +410,9 @@ int mem(int argc, char *argv[]) {
         return -1;
     }
 
-    mem_info_t *info = sys_mem_dump();
+    mem_info_t *info = (mem_info_t *) sys_mem_dump();
 
     char *units[] = {"B", "KB", "MB", "GB"};
-    char converted[32];
 
     uint32_t values[] = {info->total_mem, info->used_mem, info->free_mem};
     const char *labels[] = {"Total", "Used", "Free"};
@@ -429,7 +428,7 @@ int mem(int argc, char *argv[]) {
         }
 
         int rounded = (int)(convertedVal + 0.5);
-        if(labels[i] == "Total") {
+        if(strcmp(labels[i], "Total") == 0) {
             printf("%s: ", labels[i]);
         } else {
             printf("%s:  ", labels[i]);
@@ -544,7 +543,6 @@ int64_t yield(void) {
 
 // Print int left-aligned, pad with spaces after
 static void print_padded_int(int value, int width) {
-    char buf[16];
     int len = 0, tmp = (value < 0) ? -value : value;
     if (value == 0) len = 1;
     else {
@@ -583,7 +581,7 @@ int ps(int argc, char *argv[]) {
         return -1;
     }
 
-    process_info_t *process_list = sys_ps();
+    process_info_t *process_list = (process_info_t *) sys_ps();
     process_info_t *current = process_list;
     int totalCPUTicks = sys_total_cpu_ticks();
     // Encabezado alineado y ancho estándar
@@ -644,19 +642,19 @@ int64_t nice(uint64_t pid, uint64_t newPriority) {
 // Synchronization related functions
 
 int64_t semOpen(char *name, int initialValue) {
-    return sys_sem_open(name, initialValue);
+    return sys_sem_open((uint64_t)name, initialValue);
 }
 
 int64_t semClose(char *name) {
-    return sys_sem_close(name);
+    return sys_sem_close((uint64_t)name);
 }
 
 int64_t semWait(char *name) {
-    return sys_sem_wait(name);
+    return sys_sem_wait((uint64_t)name);
 }
 
 int64_t semPost(char *name) {
-    return sys_sem_post(name);
+    return sys_sem_post((uint64_t)name);
 }
 
 // IPC related functions

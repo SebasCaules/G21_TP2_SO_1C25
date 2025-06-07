@@ -273,7 +273,7 @@ void myExit(int64_t retValue) {
         unblockProcess(parent->pid);
     }
 
-    // removeProcess(currentProcess->pid); // Eliminar el proceso correctamente
+    removeProcess(currentProcess->pid); // Eliminar el proceso correctamente
     yield();
 }
 

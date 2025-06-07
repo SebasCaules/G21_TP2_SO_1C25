@@ -41,28 +41,16 @@ void endlessLoop() {
 	while ( 1 );
 }
 
-void endlessLoopPrintMain(char ** argv, uint64_t argc) {
-	if ( argv == NULL || argc != 2 ) {
-		fdprintf ( STDERR, "Usage: endless_loop_print <wait>\n" );
-		return;
+int endlessLoopPrint(int argc, char *argv[]) {
+	if (argc != 1)
+		return -1;
+	int64_t flag;
+	uint64_t wait = satoi(argv[0], &flag);
+	int64_t pid = getPid();
+
+	while (1) {
+		printf("%d ", pid);
+		bussyWait(wait);
 	}
-
-	int64_t satoi_flag;
-	uint64_t wait = satoi ( argv[1], &satoi_flag );
-
-	if ( wait <= 0 || !satoi_flag ) {
-		fdprintf(STDERR, "Error: <wait> must be a positive integer.\n");
-		return;
-	}
-
-	endlessLoopPrint(wait);
-}
-
-void endlessLoopPrint ( uint64_t wait )
-{
-	uint16_t pid = getPid();
-	while ( 1 ) {
-		printf( "%d ", pid );
-		bussyWait( wait );
-	}
+	return 0;
 }

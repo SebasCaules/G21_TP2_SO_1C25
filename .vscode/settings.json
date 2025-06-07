@@ -29,6 +29,9 @@
         "processinc.h": "c",
         "pipes.h": "c",
         "snake.h": "c",
-        "spinlock.h": "c"
+        "spinlock.h": "c",
+        "idtloader.h": "c",
+        "videodriver.h": "c",
+        "lib.h": "c"
     }
 }

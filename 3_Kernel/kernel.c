@@ -10,6 +10,7 @@
 #include <time.h>
 #include "keyboard.h"
 #include "pipes.h"
+#include "scheduler.h"
 
 extern uint8_t text;
 extern uint8_t rodata;

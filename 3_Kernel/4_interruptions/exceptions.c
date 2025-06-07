@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <syscalls.h>
 #include <lib.h>
+#include "interrupts.h"
 
 #define ZERO_EXCEPTION_ID 0
 #define OPCODE_EXCEPTION_ID 6

@@ -9,6 +9,12 @@
 #include "colors.h"
 #include "timeStruct.h"
 #include "pipes.h"
+#include "videoDriver.h"
+#include "keyboard.h"
+#include "interrupts.h"
+#include "rtc.h"
+#include "time.h"
+#include "audioDriver.h"
 
 typedef struct {
     uint64_t rax;

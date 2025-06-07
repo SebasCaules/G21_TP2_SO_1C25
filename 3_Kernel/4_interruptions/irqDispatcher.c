@@ -7,10 +7,10 @@
 static uint64_t int_20(uint64_t rsp);
 static void int_21();
 
-static void (*irq_routines[2])() = {
-    int_20,
-    int_21
-};
+// static void (*irq_routines[2])() = {
+//     int_20,
+//     int_21
+// };
 
 // void irqDispatcher(uint64_t irq) {
 //     irq_routines[irq]();

@@ -16,7 +16,7 @@ int64_t testProcess(uint64_t argc, char *argv[]) {
 		printf("test_processes: ERROR: Invalid number of arguments\n");
 		return -1;
 	}
-	int flag;
+	int64_t flag;
 	if ((max_processes = satoi(argv[0], &flag)) <= 0) {
 		printf("test_processes: ERROR: Invalid argument\n");
 		return -1;
@@ -48,7 +48,6 @@ int64_t testProcess(uint64_t argc, char *argv[]) {
 		// Randomly kills, blocks or unblocks processes until every one has been killed
 		while (alive > 0) {
 			printf("Procesos vivos:\n");
-			uint8_t shown = 0;
 			for (uint8_t i = 0; i < max_processes; i++) {
 				if (p_rqs[i].state != TERMINATED) {
 					int fdIdx = (i + 1) % FDS_COUNT;

@@ -11,4 +11,5 @@ int main() {
         gets(command, MAX_COMMAND_LENGTH);
         returned = getCmdInput(command);
     }
+    return OK;
 }
