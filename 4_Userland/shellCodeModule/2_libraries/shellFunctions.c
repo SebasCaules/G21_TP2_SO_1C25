@@ -77,6 +77,7 @@ int help(int argc, char *argv[]) {
         puts("  cat             - Displays the contents of a file.");
         puts("  wc              - Counts the number of lines, words, and characters in a file.");
         puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
+        puts("  phylo           - Starts the dining philosophers problem simulation.");
         puts("  exit            - Exit the shell.");
         puts("Type 'help util', 'help testing', or 'help fun' for more.");
         return OK;
