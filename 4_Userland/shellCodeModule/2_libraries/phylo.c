@@ -15,6 +15,23 @@ static uint64_t pidTable[MAX_PHILOSOPHERS] = {0};
 static int activePhilosopher[MAX_PHILOSOPHERS] = {0};
 static int philosopherCount = 0;
 
+static void getSemName(int i, char *buf);
+static int left(int i);
+static int right(int i);
+void printPhilosophersStatus();
+void checkAdjacentEating();
+void checkAndPrintStateChange();
+void think(int id);
+void eat(int id);
+void test(int i);
+void take_forks(int i);
+void put_forks(int i);
+uint64_t philosopher(int argc, char **argv);
+void addPhilosopher();
+void removePhilosopher();
+uint64_t phylo(int argc, char **argv);
+
+
 static void getSemName(int i, char *buf) {
   buf[0] = 's';
   intToString(i, buf + 1, 2);
