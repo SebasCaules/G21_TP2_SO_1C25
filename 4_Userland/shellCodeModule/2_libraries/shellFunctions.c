@@ -70,7 +70,7 @@ int help(int argc, char *argv[]) {
         puts("  cat             - Displays the contents of a file.");
         puts("  wc              - Counts the number of lines, words, and characters in a file.");
         puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
-        puts("Type 'help util', 'help testing', or 'help fun' for more.");
+        puts("Type 'help util', 'help test', or 'help fun' for more.");
         return OK;
     }
     if (strcmp(argv[0], "util") == 0) {
@@ -79,7 +79,7 @@ int help(int argc, char *argv[]) {
         puts("  time            - Display the current system time.");
         return OK;
     }
-    if (strcmp(argv[0], "testing") == 0) {
+    if (strcmp(argv[0], "test") == 0) {
         puts("  getregs         - Display the registers's contents.");
         puts("  divzero         - Throws division by zero exc.");
         puts("  opcode          - Throws invalid opcode exc.");
@@ -96,7 +96,7 @@ int help(int argc, char *argv[]) {
         puts("  colorshow       - Show the color showcase.");
         return OK;
     }
-    puts("Unknown help category. Available: util, testing, fun.");
+    puts("Unknown help category. Available: util, test, fun.");
     return OK;
 }
 
