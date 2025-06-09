@@ -30,11 +30,14 @@ MAKE_TOOLCHAIN_EXIT_CODE=$?
 docker exec -it $CONTAINER_NAME make -C /root MM="$MM"
 MAKE_ROOT_EXIT_CODE=$?
 
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 # Check if both make commands were successful
 if [[ $MAKE_TOOLCHAIN_EXIT_CODE -eq 0 && $MAKE_ROOT_EXIT_CODE -eq 0 ]]; then
-    # Run the script if both make commands succeeded
-    echo "Compilation successful!"
-    echo "Run './run.sh' to start the kernel"
+    echo -e "${GREEN}Compilation successful!${NC}"
+    echo -e "${GREEN}Run './run.sh' to start the kernel${NC}"
 else
-    echo "Compilation failed!"
+    echo -e "${RED}Compilation failed!${NC}"
 fi
