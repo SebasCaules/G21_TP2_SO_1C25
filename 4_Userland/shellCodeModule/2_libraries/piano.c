@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include <piano.h>
 
 //DO:W, RE:E, MI:R, FA:T, SOL:Y, LA:U, SI:I
