@@ -571,8 +571,8 @@ static void fprint_padded_str(int fd, const char *str, int width) {
     for (int i = 0; i < width - len; i++) putchar(' ');
 }
 
-// #define PS_HEADER "PID  PPID Prio  Stat      Name\n"
-#define PS_HEADER "PID  PPID Prio Stat    Name\n"
+#define PS_HEADER "PID  PPID Prio Stat  Name\n"
+
 char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
 
 int ps(int argc, char *argv[]) {
@@ -588,12 +588,12 @@ int ps(int argc, char *argv[]) {
     fprint_padded_str(GRAY, "PID", 4);
     fprint_padded_str(GRAY, "PPID", 5);
     fprint_padded_str(GRAY, "Prio", 5);
-    fprint_padded_str(GRAY, "Stat", 12);
+    fprint_padded_str(GRAY, "Stat", 10);
     fprint_padded_str(GRAY, "Name", 8);
     fprint_padded_str(GRAY, "StackB", 9);
     fprint_padded_str(GRAY, "StackP", 10);
-    fprint_padded_str(GRAY, "FG", 4);
-    // fprint_padded_str(GRAY, "CPU", 10);
+    fprint_padded_str(GRAY, "FG", 5);
+    fprint_padded_str(GRAY, "CPU%", 10);
     putchar('\n');
     
     char sbuf[16], sptrbuf[16];
@@ -608,22 +608,22 @@ int ps(int argc, char *argv[]) {
         print_padded_int(current->priority, 5);
         process_status_t status = current->status;
         if (status == READY) {
-            fprint_padded_str(STDMARK, status_string[status], 12);
+            fprint_padded_str(STDMARK, status_string[status], 10);
         } else if (status == BLOCKED) {
-            fprint_padded_str(STDERR, status_string[status], 12);
+            fprint_padded_str(STDERR, status_string[status], 10);
         } else if (status == RUNNING) {
-            fprint_padded_str(ORANGE, status_string[status], 12);
+            fprint_padded_str(ORANGE, status_string[status], 10);
         } else if (status == TERMINATED) {
-            fprint_padded_str(BLUE, status_string[status], 12);
+            fprint_padded_str(BLUE, status_string[status], 10);
         }
         print_padded_str(current->name, 8);
         convert_to_base_string((uint64_t)current->stackBase, 16, sbuf);
         print_padded_str(sbuf, 9);
         convert_to_base_string((uint64_t)current->stackPointer, 16, sptrbuf);
         print_padded_str(sptrbuf, 10);
-        print_padded_str(current->foreground ? "yes" : "no", 4);
+        print_padded_str(current->foreground ? "yes" : "no", 5);
         print_padded_int(CPUPercent, 10);
-        printf("%d / %d", current->cpuTicks, totalCPUTicks);
+        //printf("%d / %d", current->cpuTicks, totalCPUTicks);
         putchar('\n');
         current++;
     }

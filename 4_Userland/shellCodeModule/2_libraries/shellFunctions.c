@@ -66,7 +66,6 @@ int help(int argc, char *argv[]) {
     if (argc == 0) {
         puts("Available Commands");
         puts("  help            - Shows all available commands or help <category>.");
-        puts("  time            - Display the current system time.");
         puts("  clear           - Clear the terminal screen.");
         puts("  kill <pid>      - Kills the process with the given pid.");
         puts("  nice            - <pid> <priority> Changes the priority of the process with the given pid.");
@@ -79,7 +78,7 @@ int help(int argc, char *argv[]) {
         puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
         puts("  phylo           - Starts the dining philosophers problem simulation.");
         puts("  exit            - Exit the shell.");
-        puts("Type 'help util', 'help testing', or 'help fun' for more.");
+        puts("Type 'help util', 'help test', or 'help fun' for more.");
         return OK;
     }
     if (strcmp(argv[0], "util") == 0) {
@@ -88,7 +87,7 @@ int help(int argc, char *argv[]) {
         puts("  time            - Display the current system time.");
         return OK;
     }
-    if (strcmp(argv[0], "testing") == 0) {
+    if (strcmp(argv[0], "test") == 0) {
         puts("  getregs         - Display the registers's contents.");
         puts("  divzero         - Throws division by zero exc.");
         puts("  opcode          - Throws invalid opcode exc.");
@@ -432,7 +431,7 @@ int loop(int argc, char *argv[]) {
 
 int killCommand(int argc, char *argv[]) {
     if (argc != 1) {
-        fdprintf(STDERR, "Invalid amount of arguments. kill <pid>\n");
+        fdprintf(STDERR, "Invalid number of arguments. kill <pid>\n");
 		return ERROR;
 	}
     int64_t pid = atoi(argv[0]);
@@ -447,7 +446,7 @@ int killCommand(int argc, char *argv[]) {
 
 static int nice_command(int argc, char *argv[]) {
 	if (argc != 2) {
-        fdprintf(STDERR, "Invalid amount of arguments. Usage: nice <pid> <priority>\n");
+        fdprintf(STDERR, "Invalid number of arguments. Usage: nice <pid> <priority>\n");
 		return ERROR;
 	}
 	int pid = atoi(argv[0]);
@@ -466,7 +465,7 @@ static int nice_command(int argc, char *argv[]) {
 
 static int blockUnblock(int argc, char *argv[]) {
     if (argc != 1) {
-        fdprintf(STDERR, "Invalid amount of arguments. Usage: block <pid>\n");
+        fdprintf(STDERR, "Invalid number of arguments. Usage: block <pid>\n");
         return ERROR;
     }
     int pid = atoi(argv[0]);
@@ -497,7 +496,7 @@ static int blockUnblock(int argc, char *argv[]) {
 
 static int cat(int argc, char **argv) {
 	if (argc != 0) {
-		printf("cat: Invalid amount of arguments.\n");
+		printf("cat: Invalid number of arguments.\n");
 		return -1;
 	}
 

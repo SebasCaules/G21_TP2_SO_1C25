@@ -32,6 +32,7 @@
         "spinlock.h": "c",
         "idtloader.h": "c",
         "videodriver.h": "c",
-        "lib.h": "c"
+        "lib.h": "c",
+        "semaphore.h": "c"
     }
 }
