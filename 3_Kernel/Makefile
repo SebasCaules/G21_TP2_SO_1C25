@@ -2,6 +2,12 @@ include Makefile.inc
 
 KERNEL=kernel.bin
 
+ifdef MM
+    MM_FLAG := -D$(MM)
+else
+    MM_FLAG :=
+endif
+
 # Define source directories
 ASM_DIR=0_asm
 INCLUDE_DIR=1_include
@@ -47,7 +53,7 @@ $(INTERRUPTIONS_DIR)/%.o: $(INTERRUPTIONS_DIR)/%.c
 
 # Compile C files in libraries
 $(LIB_DIR)/%.o: $(LIB_DIR)/%.c
-	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@ $(MM_FLAG)
 
 # Assemble ASM files
 $(ASM_DIR)/%.o: $(ASM_DIR)/%.asm
