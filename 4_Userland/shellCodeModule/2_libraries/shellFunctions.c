@@ -274,7 +274,7 @@ int getCmdInput(char* command) {
     }
 
     if (pipe_pos) {
-		uint64_t pipefds[2];
+		int pipefds[2];
 		if (createPipe(pipefds) == -1) {
             fdprintf(STDERR, "Error creating pipe.\n");
 			return ERROR;
