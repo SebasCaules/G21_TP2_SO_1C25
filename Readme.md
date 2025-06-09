@@ -1,5 +1,3 @@
-
-
 # Minimal Operating System Kernel
 
 This project implements a lightweight kernel crafted from the ground up to demonstrate foundational OS mechanisms, resource allocation strategies, and modular system design. Built entirely in C and x86_64 assembly, the kernel serves as a practical and educational tool for systems-level programming.
@@ -23,13 +21,37 @@ This project implements a lightweight kernel crafted from the ground up to demon
 
 ### Steps to Build
 
+There are two main ways to run the environment: one for a **one-time manual run**, and another for **repeated development using `compile.sh`**.
+
+---
+
+#### ▶️ One-Time Manual Run
+
 1. Clone the repository:
    ```bash
    git clone git@github.com:SebasCaules/G21_TP2_SO_1C25.git
    cd G21_TP2_SO_1C25
    ```
 
-2. Create and start the Docker container (from the repository root):
+2. Pull and start the Docker container (from the repository root):
+   ```bash
+   docker pull agodio/itba-so-multi-platform:3.0
+   docker run -v ${PWD}:/root --security-opt seccomp:unconfined -ti agodio/itba-so-multi-platform:3.0
+   ```
+
+3. Inside the container, build the kernel:
+   ```bash
+   cd root/Toolchain/
+   make all
+   cd ..
+   make all   # or make buddy to use the buddy allocator
+   ```
+
+---
+
+#### 🔁 Persistent Setup for Repeated Use (`compile.sh`)
+
+1. Create and start the Docker container with a name (from the repository root):
    ```bash
    docker pull agodio/itba-so-multi-platform:3.0
    docker run -d -v ${PWD}:/root --security-opt seccomp:unconfined -it --name <container_name> agodio/itba-so-multi-platform:3.0
@@ -38,18 +60,14 @@ This project implements a lightweight kernel crafted from the ground up to demon
 
    > ⚠️ Make sure you're in the repository root folder when running the command.
 
-3. Modify the container reference used in the `Compile` step:
+2. Modify the container reference used in the `Compile` step:
    - Navigate to the `Compile` directory.
    - Update the `dockerContainer` variable (typically found in the Makefile or compile script) to match the container name you used above.  
      By default, it may be set to `SO2`.
 
-4. Inside the container, build the kernel:
+3. Now you can repeatedly run:
    ```bash
-   docker exec -it <container_name> bash
-   cd root/Toolchain/
-   make all
-   cd ..
-   make all   # or make buddy to use the buddy allocator
+   ./compile.sh
    ```
 
 ## Running the Kernel
