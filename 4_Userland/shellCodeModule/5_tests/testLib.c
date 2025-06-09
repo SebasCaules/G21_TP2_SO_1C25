@@ -5,6 +5,8 @@
 #include <testLib.h>
 #include <stddef.h>
 #include <semaphore.h>
+#include <stdLib.h>
+
 
 static uint32_t m_z = 362436069;
 static uint32_t m_w = 521288629;

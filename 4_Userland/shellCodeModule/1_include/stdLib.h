@@ -150,7 +150,7 @@ void beep(int freq, int milliseconds);
  * @param finalBase The desired base of the number.
  * @param num The number to be converted, represented as a string.
  */
-char* convert(int argc, char *argv[]);
+int convert(int argc, char *argv[]);
 
 /**
  * @brief Converts a number to a string representation in a specified base.

@@ -5,6 +5,8 @@ static void toUtcMinus3(time_struct * time);
 static char username[MAX_USERNAME_LENGTH] = { 0 };
 
 int help(int argc, char *argv[]);
+static int opCode_command(int argc, char *argv[]);
+static int divZero_command(int argc, char *argv[]);
 int showTime();
 int clearTerminal();
 int getRegs();
@@ -34,8 +36,8 @@ static module modules[] = {
     {"spotify", 0, (EntryPoint) &spotifyInterface},
     {"piano", 0, (EntryPoint) &pianoInterface},
     {"getregs", 1, &getRegs},
-    {"opcode", 1, &opCode},
-    {"divzero", 1, &divZero},
+    {"opcode", 1, &opCode_command},
+    {"divzero", 1, &divZero_command},
     {"testmm", 0, (EntryPoint) &testMM},
     {"ts", 0, (EntryPoint) &testProcess},
     {"tp", 0, (EntryPoint) &testPriority},
@@ -83,8 +85,8 @@ int help(int argc, char *argv[]) {
         puts("  getregs         - Display the registers's contents.");
         puts("  divzero         - Throws division by zero exc.");
         puts("  opcode          - Throws invalid opcode exc.");
-        puts("  testmm          - Test the memory manager.");
-        puts("  ts <max_proc>   - Test the scheduler manager.");
+        puts("  testmm <mem>    - Test the memory manager.");
+        puts("  ts <proc>       - Test the scheduler manager.");
         puts("  tp              - Test the priority manager.");
         puts("  tsem            - Test the semaphore manager.");
         return OK;
@@ -242,7 +244,7 @@ static int fillCommandAndArgs(char **command, char *args[], char *input) {
 
 int getCmdInput(char* command) {
     if(strlen(command) == 0){
-        return;
+        return OK;
     }
     
     executable_command_t executable_commands[MAX_COMMANDS];
@@ -272,7 +274,7 @@ int getCmdInput(char* command) {
     }
 
     if (pipe_pos) {
-		int pipefds[2];
+		uint64_t pipefds[2];
 		if (createPipe(pipefds) == -1) {
             fdprintf(STDERR, "Error creating pipe.\n");
 			return ERROR;
@@ -335,8 +337,19 @@ void initShell() {
     printf(WELCOME_MESSAGE, username);
     showTime();
     putchar('\n');
-    help(0, "");
+    char *emptyArgv[] = {NULL};
+    help(0, emptyArgv);
     putchar('\n');
+}
+
+static int opCode_command(int argc, char *argv[]) {
+    opCode();
+    return OK;
+}
+
+static int divZero_command(int argc, char *argv[]) {
+    divZero();
+    return OK;
 }
 
 static void toUtcMinus3(time_struct * time) {
@@ -460,7 +473,7 @@ static int blockUnblock(int argc, char *argv[]) {
         return ERROR;
     }
     int pid = atoi(argv[0]);
-    process_info_t *process_list = sys_ps();
+    process_info_t *process_list = (process_info_t *) sys_ps();
     process_info_t *current = process_list;
     while (current->pid != pid) {
         current++;

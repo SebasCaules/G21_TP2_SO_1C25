@@ -142,7 +142,6 @@ void put_forks(int i) {
 
 uint64_t philosopher(int argc, char **argv) {
   int id = stringToInt(argv[0]);
-  int writeFd = stringToInt(argv[1]);
   char mySem[12];
   getSemName(id, mySem);
   while (1) {

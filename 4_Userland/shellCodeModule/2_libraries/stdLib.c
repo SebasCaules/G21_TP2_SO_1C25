@@ -317,10 +317,10 @@ static void from_decimal(int decimal, int base, char *buffer) {
 }
 
 // char initBase, char finalBase, char *num
-char* convert(int argc, char *argv[]) {
+int convert(int argc, char *argv[]) {
     if (argc != 3) {
         fdprintf(STDERR, "Usage: convert <initBase> <finalBase> <num>\n", argc);
-        return NULL;
+        return ERROR;
     }
 
     char initBase = argv[0][0];
@@ -331,13 +331,13 @@ char* convert(int argc, char *argv[]) {
 
     if (initBaseValue == -1 || finalBaseValue == -1) {
         fdprintf(STDERR, "The initial and final base must be one of: 'b', 'o', 'd', 'h'\n");
-        return NULL;
+        return ERROR;
     }
 
     int decimal = to_decimal(num, initBaseValue);
     if (decimal == -1) {
         fdprintf(STDERR, "Invalid number %s for base %c\n", num, initBase);
-        return NULL;
+        return ERROR;
     }
 
     char convertedNum[BUFFER_SIZE];
@@ -354,7 +354,6 @@ char* convert(int argc, char *argv[]) {
     }
     return OK;
 }
-
 
 //Cambiar opr StrToInt
 int64_t satoi (char * str, int64_t * flag) {
