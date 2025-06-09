@@ -33,6 +33,7 @@
         "idtloader.h": "c",
         "videodriver.h": "c",
         "lib.h": "c",
-        "semaphore.h": "c"
+        "semaphore.h": "c",
+        "memorymanagerinc.h": "c"
     }
 }

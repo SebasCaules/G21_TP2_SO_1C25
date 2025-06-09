@@ -2,7 +2,7 @@
 #ifndef TEST_UTIL_H
 #define TEST_UTIL_H
 #include <stdint.h>
-#include <syscallsInt.h>
+#include "syscallsInt.h"
 #include "colors.h"
 
 uint32_t getUInt();

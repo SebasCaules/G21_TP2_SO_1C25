@@ -1,29 +1,26 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=c99 -I. -I../6_NoMansLand
 LDFLAGS =
 
-# Source files
-SRCS = test_mm.c memoryManager.c testLib.c
-# Header files
-HDRS = testLib.h memoryManager.h
-# Object files
+# Archivos fuente
+SRCS = test_mm.c memoryManager.c
 OBJS = $(SRCS:.c=.o)
 
-# Executable name
+# Nombre del ejecutable
 TARGET = mmTest
 
-# Default target
+# Compilación por defecto
 all: $(TARGET)
 
-# Link the object files to create the executable
+# Linkeo del ejecutable
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-# Compile source files into object files
-%.o: %.c $(HDRS)
+# Regla para compilar .c a .o
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean up build artifacts
+# Limpieza
 clean:
 	rm -f $(OBJS) $(TARGET)
 
