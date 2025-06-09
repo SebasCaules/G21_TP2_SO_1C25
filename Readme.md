@@ -29,7 +29,7 @@ There are two main ways to run the environment: one for a **one-time manual run*
 
 1. Clone the repository:
    ```bash
-   git clone git@github.com:SebasCaules/G21_TP2_SO_1C25.git
+   git clone https://github.com/SebasCaules/G21_TP2_SO_1C25.git
    cd G21_TP2_SO_1C25
    ```
 
