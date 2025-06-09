@@ -22,7 +22,6 @@ static uint8_t force_reschedule = 0;
 static int initMain(int argc, char **argv);
 static process_t* getNextProcess(void);
 static void removeProcess(uint16_t pid);
-static void adoptChildren(int16_t pid);
 
 uint64_t totalCPUTicks = 0;
 
@@ -43,7 +42,6 @@ schedulerADT initScheduler(void) {
     char *argv[] = { NULL };
     int fds[2] = { STDIN, STDOUT };
     addProcess((entry_point_t) initMain, argv, "init", 1, fds);
-    // sys_write(STDOUT, (uint16_t *)"Scheduler initialized.\n", 24);
     return scheduler;
 }
 
@@ -86,7 +84,6 @@ int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillab
     if (scheduler == NULL || scheduler->size >= MAX_PROCESSES || fileDescriptors == NULL) {
         return -1;
     }
-
 
     uint16_t pid = NO_PID;
     for (int i = 0; i < MAX_PROCESSES; i++) {
@@ -153,13 +150,27 @@ uint16_t getPid(void) {
     return scheduler->current;
 }
 
-/*
-Qué debería hacer:
-* Cambiar el estado del proceso a TERMINATED.
-* Llamar a adoptChildren(pid).
-* Si otro proceso espera su finalización, desbloquearlo.
-* Si es el proceso actual, forzar un cambio de contexto.
-*/
+static void cleanupProcessResources(process_t *process) {
+    remove_sleeping_process(process->pid);
+    remove_process_from_all_semaphore_queues(process->pid);
+    if (process->fd_out != STDOUT) {
+        send_pipe_eof(process->fd_out);
+    }
+    if (process->waiting_for_stdin) {
+        release_stdin();
+    }
+}
+
+static void adoptChildren(int16_t pid) {
+	for (int i = 0; i < MAX_PROCESSES; i++) {
+		if (scheduler->processes[i] != NULL &&
+			scheduler->processes[i]->parent_pid == pid) {
+            // Asignar el proceso huérfano al init
+			scheduler->processes[i]->parent_pid = 0;
+		}
+	}
+}
+
 int32_t killProcess(uint16_t pid) {
     if (scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL || scheduler->processes[pid]->unkillable) {
         return -1;
@@ -171,15 +182,8 @@ int32_t killProcess(uint16_t pid) {
     if (parent != NULL && parent->status == BLOCKED && parent->waiting_for_pid == process->pid) {
         unblockProcess(process->parent_pid);
     }
-    uint8_t contextSwitch = scheduler->processes[pid]->status == RUNNING;
-    remove_sleeping_process(pid);
-    remove_process_from_all_semaphore_queues(pid);
-    if (process->fd_out != STDOUT) {
-		send_pipe_eof(process->fd_out);
-	}
-    if (process->waiting_for_stdin) {
-		release_stdin();
-	}
+    uint8_t contextSwitch = (process->status == RUNNING);
+    cleanupProcessResources(process);
     removeProcess(pid);
 
     if (contextSwitch) {
@@ -224,6 +228,13 @@ int setPriority(uint16_t pid, uint8_t newPriority) {
 }
 // static process_info_t psInfo[32 + 1];
 
+uint8_t isForegroundProcess(uint16_t pid) {
+    if (scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL) {
+        return 0;
+    }
+    return (scheduler->processes[SHELL_PID]->waiting_for_pid == pid);
+}
+
 process_info_t* processStatus(void) {
     static process_info_t processInfo[MAX_PROCESSES];
     int index = 0;
@@ -238,7 +249,7 @@ process_info_t* processStatus(void) {
             info->priority = proc->priority;
             info->stackBase = proc->stack_base;
             info->stackPointer = proc->stack_pointer;
-            info->foreground = (proc->fd_in == STDIN && proc->fd_out == STDOUT);
+            info->foreground = isForegroundProcess(proc->pid);
             info->status = proc->status;
             info->cpuTicks = proc->cpuTicks;  // para trackear el uso de CPU (eventualmente)
         }
@@ -285,6 +296,7 @@ int64_t waitPid(uint32_t pid) {
         return -1;
     }
 
+    // Si el proceso hijo no termino, bloqueamos el proceso actual hasta que termine
     if (scheduler->processes[pid]->status != TERMINATED) {
         scheduler->processes[scheduler->current]->waiting_for_pid = pid;
         blockProcess(scheduler->current);
@@ -317,10 +329,9 @@ int sleepBlock(uint16_t pid, uint8_t sleep) {
         remove_sleeping_process(pid);
     }
 
-    uint8_t contextSwitch = pid == scheduler->current;
 	scheduler->processes[pid]->status = BLOCKED;
 
-	if (contextSwitch) {
+	if (pid == scheduler->current) {
 		yield();
 	}
 	return 0;
@@ -347,6 +358,15 @@ void updateStdinWait(uint8_t value) {
     scheduler->processes[scheduler->current]->waiting_for_stdin = value;
 }
 
+static void cleanupTerminatedOrphans(void) {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        if (scheduler->processes[i] != NULL && 
+            scheduler->processes[i]->status == TERMINATED && 
+            scheduler->processes[i]->parent_pid == 0) {
+            removeProcess(i);
+        }
+    }
+}
 
 static int initMain(int argc, char **argv) {
     char **shellArgs = { NULL };
@@ -354,17 +374,9 @@ static int initMain(int argc, char **argv) {
 
     int shellPid = addProcess((entry_point_t) SHELL_ADDRESS, shellArgs, "shell", 1, fds);
     setPriority(shellPid, MAX_PRIORITY);
-    // sys_write(STDOUT, (uint16_t *)"shell process started.\n", 22);
     
     while (1) {
-		for (int i = 0; i < MAX_PROCESSES; i++) {
-			if (scheduler->processes[i] != NULL) {
-				if (scheduler->processes[i]->status == TERMINATED &&
-					scheduler->processes[i]->parent_pid == 0) {
-					removeProcess(i);
-				}
-			}
-		}
+        cleanupTerminatedOrphans();
 		_hlt();
 	}
     return 0;
@@ -372,12 +384,14 @@ static int initMain(int argc, char **argv) {
 
 static process_t* getNextProcess(void) {
     if (scheduler == NULL || scheduler->size == 0) {
+        force_reschedule = 0;
         return NULL;
     }
 
     // Ver si el proceso actual puede seguir ejecutándose
     process_t *currentProcess = scheduler->processes[scheduler->current];
-    if (currentProcess != NULL &&
+
+    if (currentProcess &&
 		(currentProcess->status == READY || currentProcess->status == RUNNING) &&
 		currentProcess->remaining_quantum > 0 &&
         !force_reschedule) {
@@ -387,30 +401,23 @@ static process_t* getNextProcess(void) {
 
     // Buscar el próximo proceso listo (Round Robin)
     uint16_t start = (scheduler->current == NO_PID) ? 0 : (scheduler->current + 1) % MAX_PROCESSES;
-    uint16_t current = start;
+    uint16_t idx = start;
 
     do {
-        process_t *candidate = scheduler->processes[current];
-        if (candidate != NULL && candidate->status == READY) {
-            scheduler->current = current;
+        process_t *candidate = scheduler->processes[idx];
+        if (candidate && candidate->status == READY) {
+            scheduler->current = idx;
             candidate->remaining_quantum = candidate->priority;
             force_reschedule = 0;
             return candidate;
         }
-        current = (current + 1) % MAX_PROCESSES;
-    } while (current != start);
+        idx = (idx + 1) % MAX_PROCESSES;
+    } while (idx != start);
     force_reschedule = 0;
     return NULL;
 }
 
-static void adoptChildren(int16_t pid) {
-	for (int i = 0; i < MAX_PROCESSES; i++) {
-		if (scheduler->processes[i] != NULL &&
-			scheduler->processes[i]->parent_pid == pid) {
-			scheduler->processes[i]->parent_pid = 0;
-		}
-	}
-}
+
 
 static void removeProcess(uint16_t pid) {
     if (scheduler->processes[pid] == NULL) {

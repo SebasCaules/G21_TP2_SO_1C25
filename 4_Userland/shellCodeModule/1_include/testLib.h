@@ -2,8 +2,8 @@
 #ifndef TEST_UTIL_H
 #define TEST_UTIL_H
 #include <stdint.h>
-#include <syscallsInt.h>
-#include <stdLib.h>
+#include "syscallsInt.h"
+#include "colors.h"
 
 uint32_t getUInt();
 uint32_t getUniform (uint32_t max);

@@ -22,11 +22,6 @@ static int cat(int argc, char *argv[]);
 static int wc(int argc, char *argv[]);
 static int filter(int argc, char *argv[]);
 
-static int exitCommand(int argc, char *argv[]) {
-    clearTerminal();
-    return exit(EXIT);
-}
-
 static uint8_t foreground = 1;
 
 static module modules[] = {
@@ -34,13 +29,13 @@ static module modules[] = {
     {"time", 1, &showTime},
     {"setfont", 1, &changeFontScale},
     {"clear", 1, &clearTerminal},
-    {"convert", 1, (EntryPoint)&convert},
+    {"convert", 1, &convert},
     {"snake", 0, (EntryPoint) &snake},
     {"spotify", 0, (EntryPoint) &spotifyInterface},
     {"piano", 0, (EntryPoint) &pianoInterface},
     {"getregs", 1, &getRegs},
-    {"opcode", 1, (EntryPoint)&opCode},
-    {"divzero", 1, (EntryPoint)&divZero},
+    {"opcode", 1, &opCode},
+    {"divzero", 1, &divZero},
     {"testmm", 0, (EntryPoint) &testMM},
     {"ts", 0, (EntryPoint) &testProcess},
     {"tp", 0, (EntryPoint) &testPriority},
@@ -56,8 +51,6 @@ static module modules[] = {
     {"wc", 0, (EntryPoint) &wc},
     {"filter", 0, (EntryPoint) &filter},
     {"phylo", 0, (EntryPoint) &phylo},
-    {"exit", 1, &exitCommand},
-    {"", 0, NULL} // Sentinel to mark the end of the array
 };
 
 #define NUM_MODULES (sizeof(modules) / sizeof(modules[0]))
@@ -77,9 +70,7 @@ int help(int argc, char *argv[]) {
         puts("  cat             - Displays the contents of a file.");
         puts("  wc              - Counts the number of lines, words, and characters in a file.");
         puts("  filter <lang>   - Filters the contents of a file based on a pattern.");
-        puts("  phylo           - Starts the dining philosophers problem simulation.");
-        puts("  exit            - Exit the shell.");
-        puts("Type 'help util', 'help testing', or 'help fun' for more.");
+        puts("Type 'help util', 'help test', or 'help fun' for more.");
         return OK;
     }
     if (strcmp(argv[0], "util") == 0) {
@@ -88,7 +79,7 @@ int help(int argc, char *argv[]) {
         puts("  time            - Display the current system time.");
         return OK;
     }
-    if (strcmp(argv[0], "testing") == 0) {
+    if (strcmp(argv[0], "test") == 0) {
         puts("  getregs         - Display the registers's contents.");
         puts("  divzero         - Throws division by zero exc.");
         puts("  opcode          - Throws invalid opcode exc.");
@@ -105,7 +96,7 @@ int help(int argc, char *argv[]) {
         puts("  colorshow       - Show the color showcase.");
         return OK;
     }
-    puts("Unknown help category. Available: util, testing, fun.");
+    puts("Unknown help category. Available: util, test, fun.");
     return OK;
 }
 
@@ -251,7 +242,7 @@ static int fillCommandAndArgs(char **command, char *args[], char *input) {
 
 int getCmdInput(char* command) {
     if(strlen(command) == 0){
-        return ERROR;
+        return;
     }
     
     executable_command_t executable_commands[MAX_COMMANDS];
@@ -281,7 +272,7 @@ int getCmdInput(char* command) {
     }
 
     if (pipe_pos) {
-		uint64_t pipefds[2];
+		int pipefds[2];
 		if (createPipe(pipefds) == -1) {
             fdprintf(STDERR, "Error creating pipe.\n");
 			return ERROR;
@@ -344,8 +335,7 @@ void initShell() {
     printf(WELCOME_MESSAGE, username);
     showTime();
     putchar('\n');
-    char *empty[1] = { NULL };
-    help(0, empty);
+    help(0, "");
     putchar('\n');
 }
 
@@ -470,7 +460,7 @@ static int blockUnblock(int argc, char *argv[]) {
         return ERROR;
     }
     int pid = atoi(argv[0]);
-    process_info_t *process_list = (process_info_t *)sys_ps();
+    process_info_t *process_list = sys_ps();
     process_info_t *current = process_list;
     while (current->pid != pid) {
         current++;

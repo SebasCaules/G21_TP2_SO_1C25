@@ -34,11 +34,13 @@ uint8_t memcheck ( void * start, uint8_t value, uint32_t size ) {
 
 void bussyWait ( uint64_t n ) {
 	uint64_t i;
-	for ( i = 0; i < n; i++ );
+	for (i = 0; i < n; i++)
+		;
 }
 
 void endlessLoop() {
-	while ( 1 );
+	while (1)
+		;
 }
 
 int endlessLoopPrint(int argc, char *argv[]) {
