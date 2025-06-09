@@ -1,3 +1,5 @@
+// Keyboard Dirver de arqui deprecado para implementarlo con semáforos y circular buffer
+
 // #include <stdint.h>
 // #include "videoDriver.h"
 // #include "keyboard.h"
@@ -297,57 +299,6 @@ void pressedKey() {
 		semPost(KB_SEM_NAME);
 	}
 }
-
-// unsigned char bufferNext() {
-// 	if (end_of_file) {
-// 		end_of_file = 0;
-// 		return EOF;
-// 	}
-
-// 	if (nextToRead == current) {
-// 		return 0;
-// 	}
-// 	unsigned char toRet = buffer[nextToRead];
-// 	buffer[nextToRead++] = 0;
-// 	nextToRead %= BUFFER_SIZE;
-
-// 	if (toRet != '6' && toRet != ';' && toRet != ':' && isSpecialKey(toRet)) {
-// 		return bufferNext();
-//   }
-
-// 	if(ctrlFlag) {
-// 		switch (toRet) {
-// 			case 's':
-// 			case 'S':
-// 				regShotFlag = 1;
-// 				updateRegisters();
-// 				toRet = '\n';
-// 				break;
-// 			case 'c':
-// 			case 'C':
-// 				sys_write(1, "^C", 2, 0x00FFFFFF);
-// 				killForegroundProcess();
-// 				toRet = '\n';
-// 				break;
-// 			case 'd':
-// 			case 'D':
-// 				sys_write(1, "^D", 2, 0x00FFFFFF);
-// 				sendEOFToSTDIN();
-// 				toRet = '\n';
-// 				break;
-// 		default:
-// 			break;
-// 		}
-// 	}
-
-// 	if (ctrlFlag && (toRet == 's' || toRet == 'S')) {
-// 		regShotFlag = 1;
-// 		updateRegisters();
-// 		toRet = '\n';
-// 	}
-// 	return toRet;
-// }
-
 
 char kb_getchar() {
 	updateStdinWait(1);

@@ -152,11 +152,7 @@ static void freeArgv(char **argv) {
  * Llama a la función principal del proceso y luego termina el proceso.
  */
 void processCaller(entry_point_t main, char **args) {
-    // sys_write(STDOUT, (uint16_t *)">> ENTERED processCaller\n", 26);
     int argc = argcFromArgv(args);
-    // sys_write(STDOUT, (uint16_t *)">> Calling entry_point\n", 24);
     int64_t retValue = main(argc, args);
-    // sys_write(STDOUT, (uint16_t *)">> Process finished, exiting\n", 28);
-    // TODO: escribir sys_exit
     myExit(retValue); // Terminate the process with the return value
 }

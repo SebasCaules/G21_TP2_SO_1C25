@@ -1,10 +1,26 @@
+
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+#include "syscallsInt.h"
+#include "testLib.h"
 #include <stdint.h>
-#include <testPriority.h>
+#include <stdio.h>
 
-int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
+#define MINOR_WAIT 1000000
+#define WAIT 1000000000
+#define WAIT_STR "30000000"
 
-int64_t testPriority() {
-  int64_t pids[TOTAL_PROCESSES];
+#define TOTAL_PROCESSES 4
+
+#define LOWEST 1
+#define MEDIUM_LOW 2
+#define MEDIUM_HIGH 3
+#define HIGHEST 4
+
+int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM_LOW, MEDIUM_HIGH, HIGHEST};
+
+void testPriority() {
+	int64_t pids[TOTAL_PROCESSES];
 	char *argv[] = {WAIT_STR, NULL};
 	int fds[2] = {STDIN, STDOUT};
 	uint64_t i;
@@ -32,7 +48,7 @@ int64_t testPriority() {
 	printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
-		nice(pids[i], MEDIUM);
+		nice(pids[i], MEDIUM_LOW);
 
 	printf("UNBLOCKING...\n");
 
@@ -44,6 +60,4 @@ int64_t testPriority() {
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
 		kill(pids[i]);
-
-  return OK;
 }

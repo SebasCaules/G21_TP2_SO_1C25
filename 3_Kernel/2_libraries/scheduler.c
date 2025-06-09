@@ -42,7 +42,6 @@ schedulerADT initScheduler(void) {
     char *argv[] = { NULL };
     int fds[2] = { STDIN, STDOUT };
     addProcess((entry_point_t) initMain, argv, "init", 1, fds);
-    // sys_write(STDOUT, (uint16_t *)"Scheduler initialized.\n", 24);
     return scheduler;
 }
 
@@ -375,7 +374,6 @@ static int initMain(int argc, char **argv) {
 
     int shellPid = addProcess((entry_point_t) SHELL_ADDRESS, shellArgs, "shell", 1, fds);
     setPriority(shellPid, MAX_PRIORITY);
-    // sys_write(STDOUT, (uint16_t *)"shell process started.\n", 22);
     
     while (1) {
         cleanupTerminatedOrphans();

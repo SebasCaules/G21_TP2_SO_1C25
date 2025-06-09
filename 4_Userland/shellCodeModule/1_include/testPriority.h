@@ -3,9 +3,7 @@
 #define TEST_PRIORITY_H
 
 #include <stdint.h>
-#include <testLib.h>
-#include <syscallsInt.h>
-#include <stdLib.h>
+
 
 #define MINOR_WAIT 1000000
 #define WAIT 10000000 
