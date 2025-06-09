@@ -1,3 +1,5 @@
+#ifdef USE_BUDDY
+
 #include "memoryManager.h"
 #include <stdint.h>
 #include <stddef.h>
@@ -225,6 +227,7 @@ mem_info_t *mem_dump() {
     mem_info.free_mem = mem_info.total_mem - mem_info.used_mem;
     return &mem_info;
 }
+#endif // USE_BUDDY
 
 /*
 Explicación Visual del Buddy System:

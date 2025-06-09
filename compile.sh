@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "buddy" ]; then
+    MM="USE_BUDDY"
+else
+    MM=""
+fi
+
 # Name of the Docker container
 CONTAINER_NAME="SO2"
 
@@ -18,22 +24,17 @@ docker exec -it $CONTAINER_NAME make clean -C /root/2_Toolchain
 docker exec -it $CONTAINER_NAME make clean -C /root
 
 # Execute the make commands
-docker exec -it $CONTAINER_NAME make -C /root/2_Toolchain
+docker exec -it $CONTAINER_NAME make -C /root/2_Toolchain MM="$MM"
 MAKE_TOOLCHAIN_EXIT_CODE=$?
 
-docker exec -it $CONTAINER_NAME make -C /root
+docker exec -it $CONTAINER_NAME make -C /root MM="$MM"
 MAKE_ROOT_EXIT_CODE=$?
 
 # Check if both make commands were successful
 if [[ $MAKE_TOOLCHAIN_EXIT_CODE -eq 0 && $MAKE_ROOT_EXIT_CODE -eq 0 ]]; then
     # Run the script if both make commands succeeded
-    5_Misc/run.sh
+    echo "Compilation successful!"
+    echo "Run './run.sh' to start the kernel"
 else
-    echo "One or both make commands failed. Not running ./run.sh"
+    echo "Compilation failed!"
 fi
-
-docker exec -it $CONTAINER_NAME make clean -C /root/2_Toolchain
-docker exec -it $CONTAINER_NAME make clean -C /root
-
-# # Stop the Docker container
-# docker stop $CONTAINER_NAME
