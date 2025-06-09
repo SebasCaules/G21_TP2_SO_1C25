@@ -26,7 +26,7 @@ void testPriority() {
 	uint64_t i;
 
 	for (i = 0; i < TOTAL_PROCESSES; i++) {
-		pids[i] = newProcess((EntryPoint) &endlessLoopPrint, argv,
+		pids[i] = sys_new_process((EntryPoint) &endlessLoopPrint, argv,
 									"endless_loop_print", 0, fds);
 		if (pids[i] < 0) {
 			printf("test_prio: error creating process %d\n", (int) i);
@@ -43,7 +43,7 @@ void testPriority() {
 	printf("\nBLOCKING...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
-		blockProcess(pids[i]);
+		sys_block_process(pids[i]);
 
 	printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
 
@@ -53,11 +53,11 @@ void testPriority() {
 	printf("UNBLOCKING...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
-		unblockProcess(pids[i]);
+		sys_unblock_process(pids[i]);
 
 	bussyWait(WAIT);
 	printf("\nKILLING...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
-		kill(pids[i]);
+		sys_kill_process(pids[i]);
 }

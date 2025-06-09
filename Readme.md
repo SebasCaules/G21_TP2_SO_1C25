@@ -60,15 +60,23 @@ There are two main ways to run the environment: one for a **one-time manual run*
 
    > ⚠️ Make sure you're in the repository root folder when running the command.
 
-2. Modify the container reference used in the `Compile` step:
-   - Navigate to the `Compile` directory.
-   - Update the `dockerContainer` variable (typically found in the Makefile or compile script) to match the container name you used above.  
-     By default, it may be set to `SO2`.
+2. Open the `compile.sh` script and set the `CONTAINER_NAME` variable to match the container name you used above.  
+   By default, it is set to `SO2`.
 
-3. Now you can repeatedly run:
+3. You can now compile the kernel by running:
    ```bash
    ./compile.sh
    ```
+
+   - To compile with the buddy allocator, run:
+     ```bash
+     ./compile.sh buddy
+     ```
+
+   This script will:
+   - Start the specified Docker container.
+   - Clean and rebuild both the toolchain and kernel projects.
+   - Inform you whether the build succeeded or failed.
 
 ## Running the Kernel
 
