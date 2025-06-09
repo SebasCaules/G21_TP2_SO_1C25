@@ -575,6 +575,16 @@ static void fprint_padded_str(int fd, const char *str, int width) {
 
 char *status_string[] = {"READY", "BLOCKED", "RUNNING", "TERMINATED"};
 
+static int calculateTotalCPUTicks(process_info_t *process_list) {
+    int totalCPUTicks = 0;
+    process_info_t *current = process_list;
+    while (current->pid != NO_PID) {
+        totalCPUTicks += current->cpuTicks;
+        current++;
+    }
+    return totalCPUTicks;
+}
+
 int ps(int argc, char *argv[]) {
     if (argc != 0) {
         printf("ps: Invalid number of arguments.\n");
@@ -583,8 +593,7 @@ int ps(int argc, char *argv[]) {
 
     process_info_t *process_list = (process_info_t *) sys_ps();
     process_info_t *current = process_list;
-    int totalCPUTicks = sys_total_cpu_ticks();
-    // Encabezado alineado y ancho estándar
+    int totalCPUTicks = calculateTotalCPUTicks(process_list);
     fprint_padded_str(GRAY, "PID", 4);
     fprint_padded_str(GRAY, "PPID", 5);
     fprint_padded_str(GRAY, "Prio", 5);
@@ -595,7 +604,7 @@ int ps(int argc, char *argv[]) {
     fprint_padded_str(GRAY, "FG", 5);
     fprint_padded_str(GRAY, "CPU%", 10);
     putchar('\n');
-    
+
     char sbuf[16], sptrbuf[16];
     while (current->pid != NO_PID) {
         int CPUPercent = (totalCPUTicks > 0) ? (current->cpuTicks * 100) / totalCPUTicks : 0;
