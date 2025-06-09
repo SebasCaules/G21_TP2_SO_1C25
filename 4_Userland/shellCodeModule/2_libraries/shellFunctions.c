@@ -88,7 +88,7 @@ int help(int argc, char *argv[]) {
         puts("  testmm <mem>    - Test the memory manager.");
         puts("  ts <proc>       - Test the scheduler manager.");
         puts("  tp              - Test the priority manager.");
-        puts("  tsem            - Test the semaphore manager.");
+        puts("  tsem <n> <use>  - Test the semaphore manager.");
         return OK;
     }
     if (strcmp(argv[0], "fun") == 0) {

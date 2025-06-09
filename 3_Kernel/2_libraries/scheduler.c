@@ -134,12 +134,6 @@ void destroyScheduler(void) {
 }
 
 
-/*
-Qué debería hacer:
-* Marcar el proceso actual como READY.
-* Forzar una llamada a schedule() en la próxima interrupción (o manualmente si se quiere inmediato).
-* Puede ser tan simple como llamar a schedule(current_rsp); y hacer un return de ahí si el sistema lo permite.
-*/
 void yield(void) {
     force_reschedule = 1;
     timer_tick();
@@ -226,7 +220,6 @@ int setPriority(uint16_t pid, uint8_t newPriority) {
     scheduler->processes[pid]->remaining_quantum = newPriority;
     return 0;
 }
-// static process_info_t psInfo[32 + 1];
 
 uint8_t isForegroundProcess(uint16_t pid) {
     if (scheduler == NULL || pid >= MAX_PROCESSES || scheduler->processes[pid] == NULL) {
@@ -251,7 +244,7 @@ process_info_t* processStatus(void) {
             info->stackPointer = proc->stack_pointer;
             info->foreground = isForegroundProcess(proc->pid);
             info->status = proc->status;
-            info->cpuTicks = proc->cpuTicks;  // para trackear el uso de CPU (eventualmente)
+            info->cpuTicks = proc->cpuTicks;
         }
     }
 
@@ -388,7 +381,6 @@ static process_t* getNextProcess(void) {
         return NULL;
     }
 
-    // Ver si el proceso actual puede seguir ejecutándose
     process_t *currentProcess = scheduler->processes[scheduler->current];
 
     if (currentProcess &&
@@ -421,7 +413,7 @@ static process_t* getNextProcess(void) {
 
 static void removeProcess(uint16_t pid) {
     if (scheduler->processes[pid] == NULL) {
-        return; // Proceso ya eliminado
+        return;
     }
     destroyProcess(scheduler->processes[pid]);
     scheduler->processes[pid] = NULL;
