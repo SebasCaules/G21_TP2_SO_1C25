@@ -41,7 +41,7 @@ There are two main ways to run the environment: one for a **one-time manual run*
 
 3. Inside the container, build the kernel:
    ```bash
-   cd root/Toolchain/
+   cd root/2_Toolchain/
    make all
    cd ..
    make all   # or make buddy to use the buddy allocator
