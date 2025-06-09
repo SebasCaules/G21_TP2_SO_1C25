@@ -25,7 +25,7 @@ This project implements a lightweight kernel crafted from the ground up to demon
 
 1. Clone the repository:
    ```bash
-   git clone git@github.com:smdevesa/TP2_SO.git
+   git clone git@github.com:SebasCaules/G21_TP2_SO_1C25.git
    cd TP2_SO
    ```
 
