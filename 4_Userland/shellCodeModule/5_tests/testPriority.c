@@ -17,6 +17,7 @@
 #define HIGHEST 4
 
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM_LOW, MEDIUM_HIGH, HIGHEST};
+int64_t nice(uint64_t pid, uint64_t newPriority);
 
 void testPriority() {
 	int64_t pids[TOTAL_PROCESSES];
