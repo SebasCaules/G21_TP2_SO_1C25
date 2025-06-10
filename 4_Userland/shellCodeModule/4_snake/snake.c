@@ -136,7 +136,6 @@ static void play() {
     sleep(400);
     while(1) {
 
-        bufferSize = 0;
         bufferSize = readInput(&pressedKey);
         pressedKey = toLowercase(pressedKey);
         if (bufferSize > 0) {
