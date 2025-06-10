@@ -10,7 +10,7 @@
 
 typedef struct scheduler_t {
     process_t* processes[MAX_PROCESSES + 1];
-    uint16_t current;
+    int16_t current;
     uint8_t size;
     uint16_t total_cpu_ticks; // Total CPU ticks across all processes
 } scheduler_t;
@@ -88,13 +88,15 @@ int64_t addProcess(entry_point_t main, char** argv, char* name, uint8_t unkillab
     }
 
     uint16_t pid = NO_PID;
+    bool found = false;
     for (int i = 0; i < MAX_PROCESSES; i++) {
         if (scheduler->processes[i] == NULL) {
             pid = i;
+            found = 1;
             break;
         }
     }
-    if (pid == NO_PID) {
+    if (!found) {
         return -1;
     }
     
