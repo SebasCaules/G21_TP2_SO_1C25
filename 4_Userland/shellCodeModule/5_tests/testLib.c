@@ -1,6 +1,5 @@
-
 // This is a personal academic project. Dear PVS-Studio, please check it.
-// pvs-studio static code analyzer for c, c++ and c#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 
 #include <testLib.h>
 #include <stddef.h>
