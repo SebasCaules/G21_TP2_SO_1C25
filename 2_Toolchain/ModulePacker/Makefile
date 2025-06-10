@@ -1,10 +1,14 @@
 MP=mp.bin
 SOURCES=$(wildcard *.c)
 
+ifdef MM
+	CFLAGS += -D$(MM)
+endif
+
 all: $(MP)
 
 $(MP): $(SOURCES)
-	gcc $(SOURCES) -o $(MP)
+	gcc $(CFLAGS) $(SOURCES) -o $(MP)
 
 clean:
 	rm -rf $(MP)

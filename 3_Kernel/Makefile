@@ -41,15 +41,15 @@ $(KERNEL): $(LOADEROBJECT) $(ROOT_OBJECTS) $(DRIVER_OBJECTS) $(INTERRUPTIONS_OBJ
 
 # Compile C files in root
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@ $(MM_FLAG)
 
 # Compile C files in drivers
 $(DRIVERS_DIR)/%.o: $(DRIVERS_DIR)/%.c
-	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@ $(MM_FLAG)
 
 # Compile C files in interruptions
 $(INTERRUPTIONS_DIR)/%.o: $(INTERRUPTIONS_DIR)/%.c
-	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@
+	$(GCC) $(GCCFLAGS) -I$(INCLUDE_DIR) -I../6_NoMansLand -c $< -o $@ $(MM_FLAG)
 
 # Compile C files in libraries
 $(LIB_DIR)/%.o: $(LIB_DIR)/%.c
