@@ -44,7 +44,15 @@ There are two main ways to run the environment: one for a **one-time manual run*
    cd root/2_Toolchain/
    make all
    cd ..
-   make all   # or make buddy to use the buddy allocator
+   make all
+   ```
+
+4. (Optional) To build with the buddy memory allocator, run:
+   ```bash
+   cd root/2_Toolchain/
+   make MM="USE_BUDDY"
+   cd ..
+   make MM="USE_BUDDY"
    ```
 
 ---
