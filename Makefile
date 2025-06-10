@@ -39,7 +39,7 @@ clean-all: clean clean-test clean-pvs
 
 check:
 	pvs-studio-analyzer trace -- make all
-	pvs-studio-analyzer analyze
+	pvs-studio-analyzer analyze -e /root/0_Bootloader -e /root/2_Toolchain
 	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o report.tasks ./PVS-Studio.log
 
 
