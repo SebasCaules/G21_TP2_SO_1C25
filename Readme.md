@@ -141,5 +141,5 @@ This test exercises the custom allocator by performing randomized memory allocat
 ## Contributors
 
 - Sebastian Caules  
-- Alexis Herrera Vega  
+- Alexis Herrera Vegas 
 - Federico Kloberdanz  
