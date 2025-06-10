@@ -1,5 +1,5 @@
 
-all:  bootloader kernel userland image
+all:  toolchain bootloader kernel userland image
 
 bootloader:
 	cd 0_Bootloader; make all
@@ -35,6 +35,17 @@ clean:
 clean-test:
 	cd 7_Test; make clean
 
-clean-all: clean clean-test
+clean-all: clean clean-test clean-pvs
+
+check:
+	pvs-studio-analyzer trace -- make all
+	pvs-studio-analyzer analyze
+	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o report.tasks ./PVS-Studio.log
+
+
+clean-pvs:
+	@if [ -e PVS-Studio.log ]; then rm PVS-Studio.log; fi
+	@if [ -e report.tasks ]; then rm report.tasks; fi
+	@if [ -e strace_out ]; then rm strace_out; fi
 
 .PHONY: bootloader image collections kernel userland all clean
