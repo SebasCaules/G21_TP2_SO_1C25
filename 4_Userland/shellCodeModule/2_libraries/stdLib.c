@@ -198,7 +198,7 @@ int putchar(char c) {
 }
 
 int putsNoNewLine(const char *fmt) {
-    int len;
+    int len = 0;
     while (*fmt) {
         putchar(*fmt++);
         len++;
@@ -453,6 +453,7 @@ int mem(int argc, char *argv[]) {
             break;
         case 3 ... 4:
             filled = 2;
+            break;
         case 5 ... 7:
             filled = 3;
             break;
