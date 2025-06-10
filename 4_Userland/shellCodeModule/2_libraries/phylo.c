@@ -71,12 +71,12 @@ void checkAdjacentEating() {
     
     //Chequear si yo y el vecino de la izquierda estamos comiendo
     if (state[i] == EATING && state[leftNeighbor] == EATING) {
-      printf("ESTADO INVALIDO!!!\n", leftNeighbor, i);
+      printf("ESTADO INVALIDO!!!\n");
     }
     
     //Chequear si yo y el vecino de la derecha estamos comiendo
     if (state[i] == EATING && state[rightNeighbor] == EATING) {
-      printf("ESTADO INVALIDO!!!\n", i, rightNeighbor);
+      printf("ESTADO INVALIDO!!!\n");
     }
   }
 }
@@ -173,9 +173,11 @@ void addPhilosopher() {
   pidTable[id] = pid;
   
   activePhilosopher[id] = 1;
+  state[id] = THINKING;
+  lastState[id] = THINKING;
   philosopherCount++;
 
-  printf("Added philosopher %d (pid %d)\n", id, pid);
+  printf("Added philosopher %d (pid %d)\n", id, (int32_t)pid);
 
   checkAndPrintStateChange();
 }
