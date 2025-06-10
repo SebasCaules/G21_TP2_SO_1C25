@@ -516,7 +516,7 @@ static int cat(int argc, char **argv) {
 }
 
 static int wc(int argc, char *argv[]) {
-    char c;
+    int c;
     int lines = 0, words = 0, chars = 0;
     while((c = getCharNoWait()) != EOF) {
         if(c){
@@ -555,7 +555,7 @@ static int filter(int argc, char *argv[]) {
         fdprintf(STDERR, "Usage: filter optional: <fr>\n");
         return ERROR;
     }
-    char c;
+    int c;
     char vocales[BUFFER_SIZE];
     int idx = 0;
 
